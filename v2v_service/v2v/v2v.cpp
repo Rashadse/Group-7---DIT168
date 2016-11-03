@@ -452,7 +452,7 @@ void *executeLeaderUpdates(void *v2v) {
 
             // If we're evening out...
             if (leaderStatus.steeringAngle() == 0 && lastSteering > 0) {
-                std::this_thread::sleep_for(200ms);
+                std::this_thread::sleep_for(150ms);
             }
 
             v2vservice->sendSpeed(leaderStatus.speed());

@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.5)
+
 project(examples)
 
-set(CMAKE_CXX_STANDARD 11)
-
-add_executable(examples main.cpp)
+add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)

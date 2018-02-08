@@ -4,4 +4,4 @@ This is a repo for completing the assignments of the DIT168 V18 Industrial IT an
 
 # Authors 🖋️
 
-Måns Thörnvik, Rashad Kamsheh, Madisen Whitfield And Sarah Aldelame.
+Måns Thörnvik, Rashad Kamsheh, Madisen Whitfield and Sarah Aldelame.

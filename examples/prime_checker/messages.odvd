@@ -1,0 +1,4 @@
+message Handshake [id = 1] {
+    uint16 entity [id = 100];
+    string name [id = 101];
+}

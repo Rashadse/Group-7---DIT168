@@ -1,6 +1,10 @@
 #include <iostream>
 #include <chrono>
 
+/*
+#include "OD4Session.hpp"
+#include "Envelope.hpp"
+*/
 #include "cluon/UDPSender.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/ToProtoVisitor.hpp"
@@ -9,10 +13,19 @@
 #include "messages.hpp"
 
 int main(int /*argc*/, char** /*argv*/) {
-    PrimeChecker pc;
-    std::cout << "Hello, World! " << pc.isPrime(7) << std::endl;
-    
+    //PrimeChecker pc;
     cluon::UDPSender sender{"225.0.0.111", 1238};
+    
+    /*
+    cluon::OD4Session od4(111, [pc]
+        (cluon::data::Envelope &&envelope) noexcept {
+            if (envelope.dataType() == 1) {
+                Handshake msg = cluon:extractMessage<Handshake>(std::move(envelope))
+                std::cout << msg.entity() << " is " << (pc.isPrime(msg.entity()) ? "" : "not ") << "a prime" << std::endl;
+            }
+        }
+    );
+    */
     
     // Take input from user of number to check if prime.
     uint16_t value;

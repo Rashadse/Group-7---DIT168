@@ -1,4 +1,5 @@
 #!/bin/sh
+rm build/CMakeCache.txt
 mkdir build
 cd build
 cmake ..

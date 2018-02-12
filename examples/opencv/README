@@ -1,0 +1,7 @@
+Want to use OpenCV? Download the source code from their website and follow the installation instructions there. Note that compiling can easily get complicated since there are dozens of optional packages containing stuff that you may or may not need. These can be things like codecs for video, other things and even more things. First, know what you need and then complie OpenCV with the bare minimum, it takes TIME to compile so make sure you have it right.
+
+1. Run install_dependencies (local script file I made)
+2. Run cmake (following the online guide, adding the options you wish to compile with)
+3. Run make in the created build directory
+4. Run sudo make install to make OpenCV available on the system you're running
+5. Run through some examples if you're just getting started

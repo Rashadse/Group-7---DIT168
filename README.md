@@ -21,9 +21,9 @@ Which can be summarized like this:
 
 **Peer reviews** 
 
-All members are required to review all pull requests, but only one approval is sufficient to merge a pull request. A peer should review the pull request’s readability, functionality and coherence. e.g. (Naming conventions, document tags, comments, duplicate free code).
+All members are required to view all pull requests, but only one approval is sufficient to merge a pull request. A peer should review the pull request’s readability, functionality and coherence. e.g. (Naming conventions, document tags, comments, duplicate free code).
 The peer should leave constructive and civil comments with the intention of improving the code. A pull request shall not be blocked because of very trivial things, e.g. (indentation or very minor things not relating to the definition of done), in which case the peer can simply leave a short comment on the pull request recommending the simple change. 
-Peer reviews should be a way of helping the team with having a shared understanding of every part of the system. And not a way to criticise and ridicule the owner of the feature.  
+Peer reviews should be a way of helping the team with having a shared understanding of every part of the system. And not a way to criticize and ridicule the owner of the feature.  
 
 
 # Authors 🖋️

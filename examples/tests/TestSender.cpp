@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "libs/catch.hpp"
+#include "catch.hpp"
 
 
 // Verification test case to see catch is working.

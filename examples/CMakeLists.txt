@@ -8,9 +8,14 @@ project(examples)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra")
 
+# Path variables
+set(TESTDIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+set(LIBDIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+
 # Included packages
 find_package(libcluon REQUIRED)
 include_directories(SYSTEM ${CLUON_INCLUDE_DIRS})
+include_directories(${LIBDIR})
 
 # Executables
 add_executable(${PROJECT_NAME}-receiver ${CMAKE_CURRENT_SOURCE_DIR}/receiver.cpp)
@@ -20,7 +25,7 @@ add_executable(${PROJECT_NAME}-sender ${CMAKE_CURRENT_SOURCE_DIR}/sender.cpp)
 target_link_libraries(${PROJECT_NAME}-sender ${CLUON_LIBRARIES})
 
 # Testing
-#enable_testing()
-#add_executable(${PROJECT_NAME}-Runner TestSender.cpp ${CMAKE_CURRENT_SOURCE_DIR}/sender.cpp)
-#target_link_libraries(${PROJECT_NAME}-Runner ${CLUON_LIBRARIES})
-#add_test(NAME ${PROJECT_NAME}-Runner COMMAND ${PROJECT_NAME}-Runner)
+enable_testing()
+add_executable(${PROJECT_NAME}-Runner ${TESTDIR}/TestSender.cpp ${CMAKE_CURRENT_SOURCE_DIR}/sender.cpp)
+target_link_libraries(${PROJECT_NAME}-Runner ${CLUON_LIBRARIES})
+add_test(NAME ${PROJECT_NAME}-Runner COMMAND ${PROJECT_NAME}-Runner)

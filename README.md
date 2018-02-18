@@ -35,7 +35,7 @@ Peer reviews should be a way of helping the team with having a shared understand
 Using your terminal or git bash/interface, clone this repository using this command:
 
 ```
-git clone https://github.com/Rashadse/Group-7---DIT168.git
+git clone https://github.com/maansthoernvik/Group-7---DIT168.git
 ```
 
 change directory into the examples folder 

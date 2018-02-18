@@ -67,7 +67,7 @@ Now run make test to check if the example passes all the tests
 make test
 ``` 
 
-run the receiver file in the terminal in order to wait for any sent infomration
+run the receiver file in the terminal in order to wait for any sent information
 
 ```
 ./examples-receiver 

@@ -1,6 +1,6 @@
 # Group 7 - DIT168
 
-This is a repo for completing the assignments of the DIT168 V18 Industrial IT and Embedded Systems course
+This is a repository for completing the assignments of the DIT168 V18 Industrial IT and Embedded Systems course
 
 # Authors 🖋️
 
@@ -22,7 +22,7 @@ Which can be summarized like this:
 - Each feature will have its own branch, when the feature is done, a pull request is made to merge the feature branch with the develop branch, the pull request will not be merged unless approved by at least 1 collaborator and while the pull request has no requested changes. 
 - When milestones are achieved, a release branch will be created to merge the new features in the develop branch into the master branch.  
 - When resolving issues or any problems that are documented in the defect backlog, a hot-fix-branch will be created to update the production code and the test code.
-- Once an integration process has been completed, the develop branch will be integrated towards the master branch. The master branch, after successful integration, will have its product state incremented by one. So for a master version of 0.1, after an increment has been submitted will have version 0.2. The current version on master will be indicated using a github tag.
+- Once an integration process has been completed, the develop branch will be integrated towards the master branch. The master branch, after successful integration, will have its product state incremented by one. So for a master version of 0.1, after an increment has been submitted will have version 0.2. The current version on master will be indicated using a GitHub tag.
 
 **Peer reviews** 
 
@@ -32,7 +32,7 @@ Peer reviews should be a way of helping the team with having a shared understand
 
 **How to clone, build, and test the project**
 
-Using your terminal or git bash/interface, clone this respository using this command:
+Using your terminal or git bash/interface, clone this repository using this command:
 
 ```
 git clone https://github.com/Rashadse/Group-7---DIT168.git

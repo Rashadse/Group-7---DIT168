@@ -76,7 +76,7 @@ run the receiver file in the terminal in order to wait for any sent infomration
 And for the final step, open a new terminal in the same directory and run the sender file
 
 ```
-./examples-receiver 
+./examples-sender 
 ``` 
 you should be able to receive the following messages in the first terminal
 

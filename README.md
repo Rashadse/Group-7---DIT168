@@ -30,7 +30,7 @@ All members are required to view all pull requests, but only one approval is suf
 The peer should leave constructive and civil comments with the intention of improving the code. A pull request shall not be blocked because of very trivial things, e.g. (indentation or very minor things not relating to the definition of done), in which case the peer can simply leave a short comment on the pull request recommending the simple change. 
 Peer reviews should be a way of helping the team with having a shared understanding of every part of the system. And not a way to criticize and ridicule the owner of the feature.  
 
-**How to clone, build, and test the project**
+# How to clone, build, and test the project
 
 Using your terminal or git bash/interface, clone this repository using this command:
 
@@ -83,4 +83,40 @@ you should be able to receive the following messages in the first terminal
 ```
 Received: Hello receiver!
 ``` 
+
+**Using Docker**
+
+To automate many steps, you can use the compile script to run a docker container with all the dependencies and commands mentioned above.
+
+```
+./compile.sh
+``` 
+
+You might need to give permission to allow execution first
+
+```
+sudo chmod +x compile.sh
+
+./compile.sh
+``` 
+
+Now you are inside the docker image! You can use the same steps from before to execute the example.
+
+```
+cd examples/build
+./examples-receiver 
+``` 
+Right click on the terminal and select open new terminal
+
+```
+./compile.sh
+cd examples/build
+./examples-sender
+``` 
+Go back to the first terminal and you will see:
+
+```
+Received: Hello receiver!
+``` 
+ 
 

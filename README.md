@@ -38,51 +38,67 @@ Using your terminal or git bash/interface, clone this repository using this comm
 git clone https://github.com/maansthoernvik/Group-7---DIT168.git
 ```
 
-change directory into the examples folder 
+Navigate into the cloned project.
+
+```cd Group-7---DIT168/```
+
+To install all dependencies that the project requires, run the ```install_dependencies``` script the lies in the root directory of the project, you might need to give permission to allow execution first.
+
+```sudo chmod +x install_dependencies.sh```
+
+Run the installation script.
+
+```./install_dependencies```
+
+After installing the project's dependencies, restart you terminal or whichever interface you are currently using to make sure that the changes become active. Start up another terminal and navigate back to where you left off.
+
+Now, change directory into the examples folder.
 
 ```
 cd Group-7---DIT168/examples/
 ```
 
-make the build folder and move into it
+Make the build folder and move into it.
 
 ```
 mkdir build && cd build/
 ```
 
-generate a Makefile
+Generate a Makefile.
 
 ```
 cmake ..
 ```
 
-Now try the make command, you should see a "[100%] Built target" line at the end
+Now try the make command, you should see a "[100%] Built target" line at the end.
+
 ```
 make
 ```
 
-Now run make test to check if the example passes all the tests
+Now run make test to check if the example passes all the tests.
 
 ```
 make test
 ``` 
 
-run the receiver file in the terminal in order to wait for any sent information
+Run the receiver file in the terminal in order to wait for any sent information.
 
 ```
 ./examples-receiver 
 ``` 
 
-And for the final step, open a new terminal in the same directory and run the sender file
+And for the final step, open a new terminal in the same directory and run the sender file.
 
 ```
 ./examples-sender 
-``` 
-you should be able to receive the following messages in the first terminal
+```
+
+You should be able to receive the following messages in the first terminal.
 
 ```
 Received: Hello receiver!
-``` 
+```
 
 **Using Docker**
 

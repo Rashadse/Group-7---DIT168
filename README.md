@@ -8,7 +8,7 @@ Måns Thörnvik, Rashad Kamsheh, Madisen Whitfield and Sarah Aldelame.
 
 # Introduction
 
-We -Group 7- will be using GitHub in a very professional manner, giving high priority to traceability, shared understanding, code co- ownership, maintainable version control and secure backing up. And in order to adhere to these principles, the team will agree to follow regulations related to the following repository layout:
+We -Group 7- will be using GitHub in a very professional manner, giving high priority to traceability, shared understanding, code co- ownership, maintainable version control and secure backing up. And in order to adhere to these principles, the team agrees to the following instructions & set of rules related to the following repository layout:
 
 # Repository layout
 
@@ -122,7 +122,7 @@ Now you are inside the docker image! You can use the same steps from before to e
 cd examples/build
 ./examples-receiver 
 ``` 
-Right click on the terminal and select open new terminal
+Start a new terminal window
 
 ```
 ./compile.sh

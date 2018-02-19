@@ -50,7 +50,7 @@ Run the installation script.
 
 ```./install_dependencies```
 
-After installing the project's dependencies, restart you terminal or whichever interface you are currently using to make sure that the changes become active. Start up another terminal and navigate back to where you left off.
+After installing the project's dependencies, restart your terminal, or whichever interface you are currently using, to make sure that the changes become active. Start up another terminal and navigate back to where you left off.
 
 Now, change directory into the examples folder.
 

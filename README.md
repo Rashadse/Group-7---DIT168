@@ -86,7 +86,7 @@ Received: Hello receiver!
 
 **Using Docker**
 
-To automate many steps, you can use the compile script to run a docker container with all the dependencies and commands mentioned above.
+To automate many steps, you can use the compile script to run a docker container with all the dependencies and commands mentioned above. Note that you will have to create the build/ directory as explained above *before* running the ```compile.sh``` script file with ```mkdir build``` while located in the examples/ directory.
 
 ```
 ./compile.sh

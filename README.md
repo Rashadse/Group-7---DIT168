@@ -135,4 +135,65 @@ Go back to the first terminal and you will see:
 Received: Hello receiver!
 ``` 
  
+##Deploying the Docker image on the car##
+
+#Start by connecting to the car. This you can do by following these steps:
+1. Wi-Fi hotspot: BeagleBone-xxxx
+2. Password: BeagleBone
+
+#From your ubuntu terminal, test the connection by running:
+$ ping 192.168.8.1
+
+#Now ssh to the car by running this command:
+$ ssh debian@192.168.8.1
+
+#The ssh requires a password, type the following:
+temppwd
+
+#Now that you are in a session inside the car, connect it to the internet by executing the following commands in their order:
+1. $ connmanctl
+>scan wifi
+>services
+>agent on
+>connect [the wifi id string]
+>exit
+
+#To test the internet connection:
+$ ping 8.8.8.8
+
+#Pull the image:
+# from your car's terminal, where you previously SSH into type:
+docker pull seresearch/2018-dit-168:v0.3.5-armhf
+
+#Now that you have the container, Test that it exists by running the following command:
+docker ps
+#the command should list your pulled containers and you should find the latest one there.
+
+#Thats for deploying.
+
+##for running an executable and communicate with the car##
+1. again from the ssh session, Clone the github repository:
+git clone https://github.com/Adam2092/DIT168Example
+# you might need to install git for the above command.
+
+#Before you can send any commands to the car you need to start the proxies. In the repository you cloned, there is a file named
+#docker-compose.yml , this file contains instruction commands for starting the proxies on the car. In order to execute these instructions, run the following:
+docker compose [docker-compose.yml]
+#the above command will run the configurations in the yml file to start the proxies on the car.
+
+
+#Now that the proxies are started, find the Example.cpp file, this file has a communication constructer and instatiated objects for sending commands to the car.
+
+#In order to send these commands from the file, you need to be inside DIT168Example and execute the following:
+1. mkdir build
+2. cd into build
+3. cmake ..
+4. make
+
+#Now if you ls, you should see the executable "example" in green.
+#Run the executable to run the commands on the car by doing the following:
+./example
+
+#Thats it for connecting, deploying and communicating with the car. 
+
 

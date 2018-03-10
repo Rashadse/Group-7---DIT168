@@ -52,4 +52,4 @@ private:
     static T decode(std::string data);
 };
 
-#endif //V2V_PROTOCOL_DEMO_V2VSERVICE_H
+#endif // V2V_PROTOCOL_H

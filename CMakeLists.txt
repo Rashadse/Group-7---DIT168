@@ -9,9 +9,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra")
 
 # Path variables
-set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
-set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
-set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(TEST_DIR tests)
+set(LIB_DIR libs)
+set(SOURCE_DIR carcode)
 
 # Included packages
 find_package(libcluon REQUIRED)

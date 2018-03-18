@@ -23,20 +23,42 @@ int main(int /*argc*/, char** /*argv*/) {
         cin >> choice;
 
         set<string> ips = v2vService->getAnnouncedIps();
+        set<string>::iterator it;
         switch (choice) {
             case 1: v2vService->announcePresence(); break;
-            case 2: v2vService->followRequest(CAR_IP); break;
+            case 2:
+                if (ips.size() < 1) {
+                    cout << "There are no IPs to choose from, wait for someone to announce themselves!" << endl;
+                    break;
+                }
+                unsigned int choice;
+                cout << "Which vehicle would you like to follow?" << endl;
+                for(set<string>::iterator it = ips.begin(); it != ips.end(); ++it) {
+                    cout << "(1) " << *it << endl;
+                }
+                cin >> choice;
+                if (choice > ips.size()) break;
+
+                it = ips.begin();
+                while (true) {
+                    choice--;
+                    if (choice == 0) break;
+                    ++it;
+                }
+
+                cout << "You chose: " << *it << endl;
+
+                v2vService->followRequest(*it);
+
+                break;
             case 3: v2vService->followResponse(); break;
             case 4: v2vService->stopFollow(CAR_IP); break;
             case 5: v2vService->leaderStatus(50, 0, 100); break;
             case 6: v2vService->followerStatus(50, 0, 10, 100); break;
-            case 7: 
-                
-                for(set<string>::iterator it = ips.begin(); it != ips.end(); ++it)
-                {
-                    cout << *it <<endl;
+            case 7:
+                for(set<string>::iterator it = ips.begin(); it != ips.end(); ++it) {
+                    cout << *it << endl;
                 }
-            
                 break;
             default: return 0;
         }

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "v2v.hpp"
-#include <set>
 
 
 /**
@@ -201,9 +200,14 @@ void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t dist
     toFollower->send(encode(leaderStatus));
 }
 
+/**
+ * This functions gets the set containing IP addresses of cars that have announced their presence in the network.
+ *
+ * @return announcedIps - a set containing the IP addresses of all cars that have announced their presence.
+ */
 std::set<std::string> V2VService::getAnnouncedIps(){
     return announcedIps;
-} 
+}
 
 /**
  * Gets the current time.

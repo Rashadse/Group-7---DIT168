@@ -40,7 +40,7 @@ V2VService::V2VService() {
                 std::cout << "[UDP] ";
                 std::pair<int16_t, std::string> msg = extract(data);
 
-		std::string senderIp = sender.substr(0, sender.find(":"));
+		        std::string senderIp = sender.substr(0, sender.find(":"));
 
                 switch (msg.first) {
                     case FOLLOW_REQUEST: {

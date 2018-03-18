@@ -1,5 +1,6 @@
 #include <iostream>
 #include "v2v.hpp"
+#include <set>
 
 
 /**
@@ -19,9 +20,9 @@ V2VService::V2VService() {
                         AnnouncePresence ap = cluon::extractMessage<AnnouncePresence>(std::move(envelope));
                         std::cout << "received 'AnnouncePresence' from '"
                                   << ap.vehicleIp() << ":" << ap.activePort() << "', GroupID '"
-                                  << ap.groupId() << "'!" << std::endl;
+                                  << ap.groupId() << "'!" << std::endl;                              
 
-                        /* TODO: monitor these IPs so you know which ones to choose from */
+                        announcedIps.insert(ap.vehicleIp());            
 
                         break;
                     }
@@ -40,15 +41,17 @@ V2VService::V2VService() {
                 std::cout << "[UDP] ";
                 std::pair<int16_t, std::string> msg = extract(data);
 
+		std::string senderIp = sender.substr(0, sender.find(":"));
+
                 switch (msg.first) {
                     case FOLLOW_REQUEST: {
                         FollowRequest followRequest = decode<FollowRequest>(msg.second);
                         std::cout << "received '" << followRequest.LongName()
-                                   << "' from '" << sender << "'!" << std::endl;
+                                   << "' from '" << senderIp << "'!" << std::endl;
 
                          // After receiving a FollowRequest, check first if there is currently no car already following.
                          if (followerIp.empty()) {
-                             followerIp = sender; // If no, add the requester to known follower slot and establish a
+                             followerIp = senderIp; // If no, add the requester to known follower slot and establish a
                              // sending channel.
                              toFollower = std::make_shared<cluon::UDPSender>(followerIp, DEFAULT_PORT);
                              followResponse();
@@ -59,7 +62,7 @@ V2VService::V2VService() {
                          FollowResponse followResponse = decode<FollowResponse>(msg.second);
                          std::cout << "received '" << followResponse.LongName()
                                    << "' with NTPServerIP '" << followResponse.ntpServerIp()
-                                   << "' from '" << sender << "'!" << std::endl;
+                                   << "' from '" << senderIp << "'!" << std::endl;
 
                          /* TODO: implement NTP synchronisation */
 
@@ -68,14 +71,14 @@ V2VService::V2VService() {
                      case STOP_FOLLOW: {
                          StopFollow stopFollow = decode<StopFollow>(msg.second);
                          std::cout << "received '" << stopFollow.LongName()
-                                   << "' from '" << sender << "'!" << std::endl;
+                                   << "' from '" << senderIp << "'!" << std::endl;
 
                          // Clear either follower or leader slot, depending on current role.
-                         if (sender == followerIp) {
+                         if (senderIp == followerIp) {
                              followerIp = "";
                              toFollower.reset();
                          }
-                         else if (sender == leaderIp) {
+                         else if (senderIp == leaderIp) {
                              leaderIp = "";
                              toLeader.reset();
                          }
@@ -84,7 +87,7 @@ V2VService::V2VService() {
                      case FOLLOWER_STATUS: {
                          FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
                          std::cout << "received '" << followerStatus.LongName()
-                                   << "' from '" << sender << "'!" << std::endl;
+                                   << "' from '" << senderIp << "'!" << std::endl;
 
                          /* TODO: implement lead logic (if applicable) */
 
@@ -93,7 +96,7 @@ V2VService::V2VService() {
                      case LEADER_STATUS: {
                          LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
                          std::cout << "received '" << leaderStatus.LongName()
-                                   << "' from '" << sender << "'!" << std::endl;
+                                   << "' from '" << senderIp << "'!" << std::endl;
 
                          /* TODO: implement follow logic */
 
@@ -133,7 +136,7 @@ void V2VService::followRequest(std::string vehicleIp) {
 
 /**
  * This function send a FollowResponse (id = 1003) message and is sent in response to a FollowRequest (id = 1002).
- * This message will contain the NTP server IP for time synchronization between the target and the sender.
+ * This message will contain the NTP server IP for time synchronization between the target and the senderIp.
  */
 void V2VService::followResponse() {
     if (followerIp.empty()) return;
@@ -150,8 +153,15 @@ void V2VService::followResponse() {
  */
 void V2VService::stopFollow(std::string vehicleIp) {
     StopFollow stopFollow;
-    if (vehicleIp == leaderIp) toLeader->send(encode(stopFollow));
-    else if (vehicleIp == followerIp) toFollower->send(encode(stopFollow));
+    if (vehicleIp == leaderIp) {
+    	toLeader->send(encode(stopFollow));
+    	leaderIp = "";
+     	toLeader.reset();
+    } else if (vehicleIp == followerIp){
+	    toFollower->send(encode(stopFollow));
+     	followerIp = "";
+     	toFollower.reset();
+    }
 }
 
 /**
@@ -190,6 +200,10 @@ void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t dist
     leaderStatus.distanceTraveled(distanceTraveled);
     toFollower->send(encode(leaderStatus));
 }
+
+std::set<std::string> V2VService::getAnnouncedIps(){
+    return announcedIps;
+} 
 
 /**
  * Gets the current time.

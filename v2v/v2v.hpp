@@ -9,8 +9,9 @@
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/Envelope.hpp"
 #include "messages.hpp"
+#include <set>
 
-static const std::string CAR_IP = "127.0.0.1";
+static const std::string CAR_IP = "192.168.0.8";
 static const std::string NTP_IP = "127.0.0.1";
 static const std::string GROUP_ID = "7";
 
@@ -24,6 +25,7 @@ static const int STOP_FOLLOW = 1004;
 static const int LEADER_STATUS = 2001;
 static const int FOLLOWER_STATUS = 3001;
 
+
 class V2VService {
 public:
     V2VService();
@@ -34,8 +36,11 @@ public:
     void stopFollow(std::string vehicleIp);
     void leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled);
     void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
+    std::set<std::string> getAnnouncedIps();
 
 private:
+    std::set<std::string> announcedIps;
+
     std::string leaderIp;
     std::string followerIp;
 

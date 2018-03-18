@@ -1,0 +1,14 @@
+global.buffer.memorySegmentSize = 2800000
+global.buffer.numberOfMemorySegments = 4
+
+odsupercomponent.pulsetimeack.timeout = 5000 # (in milliseconds)
+odsupercomponent.pulsetimeack.exclude = odcockpit
+odcockpit.directoriesForSharedLibaries = /opt/opendlv.miniature
+
+example.deceleration.max = -1.0
+example.acceleration.max = 0.25
+example.steering.max = 38.0
+
+proxy-miniature-pwm-motor.names = steering,propulsion
+proxy-miniature-pwm-motor.types = servo,esc
+proxy-miniature-pwm-motor.channels = 1,2

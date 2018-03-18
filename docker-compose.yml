@@ -1,0 +1,30 @@
+version: '2'
+services:
+    odsupercomponent:
+        image: seresearch/2018-dit-168:v0.3.5-armhf
+        network_mode: "host"
+        restart: always
+        volumes:
+        - .:/opt/miniature.data
+        command: "/opt/od4/bin/odsupercomponent --cid=111 --verbose=1 --configuration=/opt/miniature.data/configuration"
+
+    proxy-miniature-pwm-motor:
+        image: seresearch/2018-dit-168:v0.3.5-armhf
+        depends_on:
+        - odsupercomponent
+        network_mode: "host"
+        restart: always
+        privileged: true
+        volumes:
+        - /sys/:/sys/
+        - /dev/:/dev/
+        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=111 --freq=50 --id=1"
+
+    # Your microservice.
+    example:
+        image: group7/carcode
+        depends_on:
+        - proxy-miniature-pwm-motor
+        network_mode: "host"
+        restart: always # maybe running only once is enough?
+        command: "/opt/carcode"

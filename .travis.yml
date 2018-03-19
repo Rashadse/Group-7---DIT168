@@ -16,3 +16,12 @@ branches:
   only:
   - master
   - develop
+
+# recieve email notifications
+# you can edit the emails below if you want to stop or change notifications
+notifications:
+  email:
+    - rashadse@hotmail.com
+    - Madisen@sendify.se
+    - sarahaldelame88@gmail.com
+    - gusthomaa@student.gu.se

@@ -1,0 +1,18 @@
+language: cpp
+compiler: clang
+
+# install cmake
+
+addons:
+  apt:
+    packages:
+    - cmake
+    sources:
+    - sourceline: 'https://github.com/L2Program/FlintPlusPlus.git'
+
+
+# which branches to build
+branches:
+  only:
+  - master
+  - develop

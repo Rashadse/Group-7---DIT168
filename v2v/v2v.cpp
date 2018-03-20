@@ -6,6 +6,8 @@
  * Implementation of the V2VService class as declared in v2v.hpp
  */
 V2VService::V2VService() {
+    followerIp = "";
+    leaderIp = "";
     /*
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This is where
      * AnnouncePresence messages will be received.
@@ -150,13 +152,13 @@ void V2VService::followResponse() {
  *
  * @param vehicleIp - IP of the target for the request
  */
-void V2VService::stopFollow(std::string vehicleIp) {
+void V2VService::stopFollow() {
     StopFollow stopFollow;
-    if (vehicleIp == leaderIp) {
+    if (leaderIp != "") {
     	toLeader->send(encode(stopFollow));
     	leaderIp = "";
      	toLeader.reset();
-    } else if (vehicleIp == followerIp){
+    } else if (followerIp != ""){
 	    toFollower->send(encode(stopFollow));
      	followerIp = "";
      	toFollower.reset();

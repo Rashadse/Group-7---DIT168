@@ -52,7 +52,7 @@ int main(int /*argc*/, char** /*argv*/) {
 
                 break;
             case 3: v2vService->followResponse(); break;
-            case 4: v2vService->stopFollow(CAR_IP); break;
+            case 4: v2vService->stopFollow(); break;
             case 5: v2vService->leaderStatus(50, 0, 100); break;
             case 6: v2vService->followerStatus(50, 0, 10, 100); break;
             case 7:

@@ -11,7 +11,7 @@
 #include "messages.hpp"
 #include <set>
 
-static const std::string CAR_IP = "192.168.0.14";
+static const std::string CAR_IP = "192.168.43.171";
 static const std::string NTP_IP = "127.0.0.1";
 static const std::string GROUP_ID = "7";
 
@@ -33,7 +33,7 @@ public:
     void announcePresence();
     void followRequest(std::string vehicleIp);
     void followResponse();
-    void stopFollow(std::string vehicleIp);
+    void stopFollow();
     void leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled);
     void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
 

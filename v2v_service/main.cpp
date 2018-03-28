@@ -1,6 +1,6 @@
 #include <iostream>
 #include <set>
-#include "v2v.hpp"
+#include "v2v/v2v.hpp"
 
 
 using namespace std;
@@ -9,7 +9,7 @@ int main(int /*argc*/, char** /*argv*/) {
     
     
     while (true) {
-        int choice;
+        unsigned int choice;
         cout << "Which message would you like to send?" << std::endl;
         cout << "(1) AnnouncePresence" << std::endl;
         cout << "(2) FollowRequest" << std::endl;
@@ -24,6 +24,7 @@ int main(int /*argc*/, char** /*argv*/) {
 
         set<string> ips = v2vService->getAnnouncedIps();
         set<string>::iterator it;
+        unsigned int index = 1;
         switch (choice) {
             case 1: v2vService->announcePresence(); break;
             case 2:
@@ -31,10 +32,11 @@ int main(int /*argc*/, char** /*argv*/) {
                     cout << "There are no IPs to choose from, wait for someone to announce themselves!" << endl;
                     break;
                 }
-                unsigned int choice;
+                
                 cout << "Which vehicle would you like to follow?" << endl;
                 for(set<string>::iterator it = ips.begin(); it != ips.end(); ++it) {
-                    cout << "(1) " << *it << endl;
+                    cout << "(" << index << ") " << *it << endl;
+                    index++;
                 }
                 cin >> choice;
                 if (choice > ips.size()) break;

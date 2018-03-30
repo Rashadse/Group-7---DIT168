@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Project name
-project(carcode)
+project(CarServices)
 
 # Flags and standards
 set(CMAKE_CXX_STANDARD 14)
@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra")
 # Path variables
 set(TEST_DIR tests)
 set(LIB_DIR libs)
-set(V2V_DIR v2v)
+set(V2V_DIR v2v_service)
 
 # Included packages
 find_package(libcluon REQUIRED)
@@ -27,9 +27,9 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/messages.odvd)
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 
-# Executables
-add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${V2V_DIR}/v2v.cpp)
-target_link_libraries(${PROJECT_NAME} ${CLUON_LIBRARIES})
+# Executables -- ADD YOUR SERVICES COMPILATION COMMANDS BELOW
+add_executable(${PROJECT_NAME}-V2VService ${V2V_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${V2V_DIR}/v2v/v2v.cpp)
+target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
 
 # Testing
 #enable_testing()

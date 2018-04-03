@@ -43,10 +43,21 @@ message FollowerStatus [id = 3001] {
 
 // Create message by specifying them like below.
 // Please note that every message HAS TO HAVE A UNIQUE ID!
-message ExampleMessage [id = 9999] {
-  // Fields inside the message do not need to be unique, meaning
-  // that this message (ExampleMessage) can have a field with id = 1
-  // while FollowerStatus ALSO can have a field with id = 1. It is only
-  // the id of the WHOLE MESSAGE that needs to be unique.
-  uint32 messageField [id = 1];
+message InternalFollowRequest [id = 4000] {
+  string groupid [id = 1];
 }
+
+message InternalFollowResponse [id = 4001] {
+  string groupid [id = 1];
+  uint8 status [id = 2];
+}
+
+message InternalStopFollow [id = 4002] {}
+
+message InternalStopFollowResponse [id = 4003] {}
+
+message InternalGetAllGroups [id = 4004] {}
+
+message InternalGetAllGroupsResponse [id = 4005] {}
+
+message InternalEmergencyBrake [id = 4006] {}

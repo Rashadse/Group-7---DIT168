@@ -25,8 +25,10 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         std::cout << "received 'AnnouncePresence' from '"
                                   << ap.vehicleIp() << "', GroupID '"
                                   << ap.groupId() << "'!" << std::endl;                              
-
-                        mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
+                        
+                        if (ap.groupId() !=myGroupId) {
+                            mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
+                        }
                         
                         break;
                     }

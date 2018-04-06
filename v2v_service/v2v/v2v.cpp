@@ -22,11 +22,9 @@ V2VService::V2VService() {
                         std::cout << "received 'AnnouncePresence' from '"
                                   << ap.vehicleIp() << "', GroupID '"
                                   << ap.groupId() << "'!" << std::endl;                              
-
-                        //announcedIps.insert(ap.vehicleIp());  
-                        //adding into map
+                                  
                         mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
-                        //end of map
+                        
                         break;
                     }
                     default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
@@ -202,19 +200,13 @@ void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t dist
 }
 
 /**
- * This functions gets the set containing IP addresses of cars that have announced their presence in the network.
+ * This functions gets a map containing IP addresses of cars & their groupIds as they announced presence in the network.
  *
- * @return announcedIps - a set containing the IP addresses of all cars that have announced their presence.
+ * @return mapOfIps - a map containing the IP addresses and the groupIds of all cars that have announced their presence.
  */
-std::set<std::string> V2VService::getAnnouncedIps(){
-    return announcedIps;
-}
-
-//returning the map
 std::map<std::string, std::string> V2VService::getMapOfIps(){
     return mapOfIps;
 }
-//end of map
 
 /**
  * Gets the current time.

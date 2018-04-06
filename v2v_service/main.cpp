@@ -25,12 +25,7 @@ int main(int /*argc*/, char** /*argv*/) {
         
         
         map<std::string, std::string> myMap = v2vService->getMapOfIps();
-        
-        
-        
-        //set<string> ips = v2vService->getAnnouncedIps();
-        map<std::string, std::string>::iterator it;
-        unsigned int index = 1;
+        std::string groupId = "";
         switch (choice) {
             case 1: v2vService->announcePresence(); break;
             case 2:
@@ -41,23 +36,12 @@ int main(int /*argc*/, char** /*argv*/) {
                 
                 cout << "Which vehicle would you like to follow?" << endl;
                 for(std::map<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
-                    cout << "(" << index << ") " << it->first << " " << it->second << endl;
-                    index++;
+                    cout << it->first << " " << it->second << endl;
                 }
-                cin >> choice;
-                if (choice > myMap.size()) break;
-
-                it = myMap.begin();
-                while (true) {
-                    choice--;
-                    if (choice == 0) break;
-                    ++it;
-                }
-
-                cout << "You chose: " << it->first << endl;
-
-                v2vService->followRequest(it->second);
-
+                cin >> groupId;
+                cout << "You chose: " << groupId << endl;
+                v2vService->followRequest(myMap[groupId]);
+                
                 break;
             case 3: v2vService->followResponse(); break;
             case 4: v2vService->stopFollow(); break;
@@ -69,7 +53,6 @@ int main(int /*argc*/, char** /*argv*/) {
                 }
                 break;
             default: return 0;
-        }
-    
+        }    
     }
 }

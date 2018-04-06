@@ -13,9 +13,6 @@
 #include <map>
 #include <string>
 
-static const std::string CAR_IP = "192.168.0.32";
-static const std::string GROUP_ID = "7";
-
 static const int BROADCAST_CHANNEL = 200;
 static const int DEFAULT_PORT = 50001;
 
@@ -29,7 +26,7 @@ static const int FOLLOWER_STATUS = 3001;
 
 class V2VService {
 public:
-    V2VService();
+    V2VService(std::string ip, std::string groupId);
 
     void announcePresence();
     void followRequest(std::string vehicleIp);
@@ -49,6 +46,9 @@ private:
     std::map<std::string, std::string> mapOfIps;
     //end of map
 
+    std::string myIp;
+    std::string myGroupId;
+    
     std::string leaderIp;
     std::string followerIp;
 

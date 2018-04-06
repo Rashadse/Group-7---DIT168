@@ -5,9 +5,12 @@
 /**
  * Implementation of the V2VService class as declared in v2v.hpp
  */
-V2VService::V2VService() {
+V2VService::V2VService(std::string ip, std::string groupId) {
     followerIp = "";
     leaderIp = "";
+    myIp = ip;
+    myGroupId = groupId;
+    
     /*          
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This is where
      * AnnouncePresence messages will be received.
@@ -21,7 +24,7 @@ V2VService::V2VService() {
                         AnnouncePresence ap = cluon::extractMessage<AnnouncePresence>(std::move(envelope));
                         std::cout << "received 'AnnouncePresence' from '"
                                   << ap.vehicleIp() << "', GroupID '"
-                                  << ap.groupId() << "'!" << std::endl;                              
+                                  << ap.groupId() << "'!" << std::endl;
 
                         //announcedIps.insert(ap.vehicleIp());  
                         //adding into map

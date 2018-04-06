@@ -2,13 +2,12 @@
 #include <set>
 #include "v2v/v2v.hpp"
 #include <map>
-
+#include <pthread.h>
 
 using namespace std;
 int main(int /*argc*/, char** /*argv*/) {
     shared_ptr<V2VService> v2vService = make_shared<V2VService>("192.168.0.28", "6");
-    
-    
+
     while (true) {
         unsigned int choice;
         cout << "Which message would you like to send?" << std::endl;

@@ -117,8 +117,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 void V2VService::announcePresence() {
     if (!followerIp.empty()) return;
     AnnouncePresence announcePresence;
-    announcePresence.vehicleIp(CAR_IP);
-    announcePresence.groupId(GROUP_ID);
+    announcePresence.vehicleIp(myIp);
+    announcePresence.groupId(myGroupId);
     broadcast->send(announcePresence);
 }
 

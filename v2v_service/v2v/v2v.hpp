@@ -10,6 +10,8 @@
 #include "cluon/Envelope.hpp"
 #include "messages.hpp"
 #include <set>
+#include <map>
+#include <string>
 
 static const std::string CAR_IP = "192.168.43.171";
 static const std::string NTP_IP = "127.0.0.1";
@@ -38,9 +40,15 @@ public:
     void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
 
     std::set<std::string> getAnnouncedIps();
+    //getting the map
+    std::map<std::string, std::string> getMapOfIps();
+    //end of map
 
 private:
     std::set<std::string> announcedIps;
+    //creating a map
+    std::map<std::string, std::string> mapOfIps;
+    //end of map
 
     std::string leaderIp;
     std::string followerIp;

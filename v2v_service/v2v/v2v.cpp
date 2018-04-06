@@ -8,7 +8,7 @@
 V2VService::V2VService() {
     followerIp = "";
     leaderIp = "";
-    /*
+    /*          
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This is where
      * AnnouncePresence messages will be received.
      */
@@ -23,8 +23,10 @@ V2VService::V2VService() {
                                   << ap.vehicleIp() << ":" << ap.activePort() << "', GroupID '"
                                   << ap.groupId() << "'!" << std::endl;                              
 
-                        announcedIps.insert(ap.vehicleIp());            
-
+                        //announcedIps.insert(ap.vehicleIp());  
+                        //adding into map
+                        mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
+                        //end of map
                         break;
                     }
                     default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
@@ -210,6 +212,12 @@ void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t dist
 std::set<std::string> V2VService::getAnnouncedIps(){
     return announcedIps;
 }
+
+//returning the map
+std::map<std::string, std::string> V2VService::getMapOfIps(){
+    return mapOfIps;
+}
+//end of map
 
 /**
  * Gets the current time.

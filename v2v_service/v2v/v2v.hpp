@@ -14,7 +14,6 @@
 #include <string>
 
 static const std::string CAR_IP = "192.168.43.171";
-static const std::string NTP_IP = "127.0.0.1";
 static const std::string GROUP_ID = "7";
 
 static const int BROADCAST_CHANNEL = 200;

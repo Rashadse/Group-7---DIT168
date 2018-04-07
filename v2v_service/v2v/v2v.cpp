@@ -277,7 +277,7 @@ void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t dist
  *
  * @return mapOfIps - a map containing the IP addresses and the groupIds of all cars that have announced their presence.
  */
-std::map<std::string, std::string> V2VService::getMapOfIps(){
+std::map<std::string, std::string> V2VService::getMapOfIps() {
     return mapOfIps;
 }
 
@@ -285,7 +285,7 @@ void V2VService::healthCheck() {
     std::map<std::string, std::string> ipMap = getMapOfIps();
     std::cout << "V2VService health check" << std::endl;
     std::cout << "<<<<<<<<<<<<>>>>>>>>>>>>>" << std::endl;
-    std::cout << "GroupID: " << myGroupId << "IP-address: " << myIp << std::endl;
+    std::cout << "GroupID: " << myGroupId << " IP-address: " << myIp << std::endl;
     std::cout << "-------------------------" << std::endl;
     std::cout << "Current Time: " << getTime() << std::endl;
     std::cout << "-------------------------" << std::endl;

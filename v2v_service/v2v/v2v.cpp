@@ -151,10 +151,6 @@ void V2VService::followResponse() {
     toFollower->send(encode(followResponse));
 }
 
-void stopUpdateThread(pthread_t *threadId) {
-    std::cout << "Stopping thread with ID: " << threadId << std::endl;
-}
-
 /**
  * This function sends a StopFollow (id = 1004) request on the ip address of the parameter vehicleIp. If the IP address
  * is neither that of the follower nor the leader, this function ends without sending the request message.
@@ -164,18 +160,12 @@ void stopUpdateThread(pthread_t *threadId) {
 void V2VService::stopFollow() {
     StopFollow stopFollow;
     if (leaderIp != "") {
-        // Stop sending updates
-        stopUpdateThread(&followerStatusThread);
-
         // Clear comm channels
     	toLeader->send(encode(stopFollow));
     	leaderIp = "";
      	toLeader.reset();
     }
     if (followerIp != "") {
-        // Stop sending updates
-        stopUpdateThread(&leaderStatusThread);
-        
         // Clear comm channels
 	    toFollower->send(encode(stopFollow));
      	followerIp = "";
@@ -190,7 +180,10 @@ void *sendFollowerStatuses(void *v2v) {
 
     using namespace std::chrono_literals;
     while (!v2vservice->leaderIp.empty()) {
-        std::cout << "Sending follower status at: " << v2vservice->getTime() << std::endl;
+        // Get sensor data
+        
+        // Send sensor data
+        v2vservice->followerStatus(0, 0, 0, 0);
         std::this_thread::sleep_for(500ms);
     }
 
@@ -237,7 +230,10 @@ void *sendLeaderStatuses(void *v2v) {
     
     using namespace std::chrono_literals;
     while (!v2vservice->followerIp.empty()) {
-        std::cout << "Sending leader status at: " << v2vservice->getTime() << std::endl;
+        // Get sensor data
+    
+        // Send sensor data
+        v2vservice->leaderStatus(0, 0, 0);
         std::this_thread::sleep_for(500ms);
     }
     

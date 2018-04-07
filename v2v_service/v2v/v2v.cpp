@@ -188,6 +188,14 @@ void *sendFollowerStatuses(void *v2v) {
     v2vservice = (V2VService *)v2v;
     std::cout << "Update leader thread started with ID: " << v2vservice->followerStatusThread << std::endl;
 
+    int retries = 5;
+    using namespace std::chrono_literals;
+    while (retries > 0) {
+        std::cout << "Sending follower status at: " << v2vservice->getTime() << std::endl;
+        std::this_thread::sleep_for(500ms);
+        retries -= 1;
+    }
+
     pthread_exit(NULL);
 }
 
@@ -228,6 +236,14 @@ void *sendLeaderStatuses(void *v2v) {
     V2VService *v2vservice;
     v2vservice = (V2VService *)v2v;
     std::cout << "Update follower thread started with ID: " << v2vservice->leaderStatusThread << std::endl;
+    
+    int retries = 5;
+    using namespace std::chrono_literals;
+    while (retries > 0) {
+        std::cout << "Sending leader status at: " << v2vservice->getTime() << std::endl;
+        std::this_thread::sleep_for(500ms);
+        retries -= 1;
+    }
     
     pthread_exit(NULL);
 }

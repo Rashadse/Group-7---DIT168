@@ -1,8 +1,9 @@
 #include "roboticscape.h"
+#include <iostream>
 
 int main() {
     if(rc_initialize()){
-        fprintf(stderr,"ERROR: failed to run rc_initialize(), are you root?\n");
+        std::cout << "BLINK YOU ****" << std::endl;
         return -1;
     }
     rc_blink();

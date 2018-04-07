@@ -27,4 +27,4 @@ services:
         - proxy-miniature-pwm-motor
         network_mode: "host"
         restart: always # maybe running only once is enough?
-        command: "/opt/carcode"
+        command: "/opt/CarServices-V2VService"

@@ -33,6 +33,9 @@ public:
     void followResponse();
     void stopFollow();
 
+    std::string leaderIp;
+    std::string followerIp;
+
     pthread_t leaderStatusThread;
     pthread_t followerStatusThread;
     
@@ -54,9 +57,6 @@ private:
 
     std::string myIp;
     std::string myGroupId;
-    
-    std::string leaderIp;
-    std::string followerIp;
 
     std::shared_ptr<cluon::OD4Session>  broadcast;
     std::shared_ptr<cluon::UDPReceiver> incoming;

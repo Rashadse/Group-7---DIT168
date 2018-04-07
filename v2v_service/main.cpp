@@ -63,6 +63,7 @@ int main(int /*argc*/, char** /*argv*/) {
             case 5: v2vService->leaderStatus(50, 0, 100); break;
             case 6: v2vService->followerStatus(50, 0, 10, 100); break;
             case 7:
+                ipMap = v2vService->getMapOfIps();
                 for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
                     cout << it->first << " " << it->second << endl;
                 }

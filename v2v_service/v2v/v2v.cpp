@@ -26,6 +26,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                                   << ap.vehicleIp() << "', GroupID '"
                                   << ap.groupId() << "'!" << std::endl;                              
                         
+                        // Filter out yourself from announcement
                         if (ap.groupId() != myGroupId) {
                             mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
                         }
@@ -61,6 +62,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                              // sending channel.
                              toFollower = std::make_shared<cluon::UDPSender>(followerIp, DEFAULT_PORT);
                              followResponse();
+                             
+                             startReportingToFollower();
                          }
                          break;
                      }
@@ -69,7 +72,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          std::cout << "received '" << followResponse.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
 
-                        
+                        startReportingToLeader();
 
                          break;
                      }
@@ -148,6 +151,10 @@ void V2VService::followResponse() {
     toFollower->send(encode(followResponse));
 }
 
+void stopUpdateThread(pthread_t *threadId) {
+    std::cout << "Stopping thread with ID: " << threadId << std::endl;
+}
+
 /**
  * This function sends a StopFollow (id = 1004) request on the ip address of the parameter vehicleIp. If the IP address
  * is neither that of the follower nor the leader, this function ends without sending the request message.
@@ -157,13 +164,43 @@ void V2VService::followResponse() {
 void V2VService::stopFollow() {
     StopFollow stopFollow;
     if (leaderIp != "") {
+        // Stop sending updates
+        stopUpdateThread(&followerStatusThread);
+
+        // Clear comm channels
     	toLeader->send(encode(stopFollow));
     	leaderIp = "";
      	toLeader.reset();
-    } else if (followerIp != ""){
+    }
+    if (followerIp != "") {
+        // Stop sending updates
+        stopUpdateThread(&leaderStatusThread);
+        
+        // Clear comm channels
 	    toFollower->send(encode(stopFollow));
      	followerIp = "";
      	toFollower.reset();
+    }
+}
+
+void *sendFollowerStatuses(void *v2v) {
+    V2VService *v2vservice;
+    v2vservice = (V2VService *)v2v;
+    std::cout << "Update leader thread started with ID: " << v2vservice->followerStatusThread << std::endl;
+
+    pthread_exit(NULL);
+}
+
+void V2VService::startReportingToLeader() {
+    // Get time before reporting was started to break connection in case no updates are received for ~500ms
+    lastLeaderUpdate = getTime();
+
+    int status;
+    status = pthread_create(&followerStatusThread, NULL, sendFollowerStatuses, (void *)this);
+    
+    // pthread_create returns 1 if an error occured.
+    if (status) {
+        std::cout << "Error creating update leader thread" << std::endl;
     }
 }
 
@@ -185,6 +222,27 @@ void V2VService::followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t di
     followerStatus.distanceFront(distanceFront);
     followerStatus.distanceTraveled(distanceTraveled);
     toLeader->send(encode(followerStatus));
+}
+
+void *sendLeaderStatuses(void *v2v) {
+    V2VService *v2vservice;
+    v2vservice = (V2VService *)v2v;
+    std::cout << "Update follower thread started with ID: " << v2vservice->leaderStatusThread << std::endl;
+    
+    pthread_exit(NULL);
+}
+
+void V2VService::startReportingToFollower() {
+    // Get time before reporting was started to break connection in case no updates are received for ~500ms
+    lastFollowerUpdate = getTime();
+
+    int status;
+    status = pthread_create(&leaderStatusThread, NULL, sendLeaderStatuses, (void *)this);
+    
+    // pthread_create returns 1 if an error occured.
+    if (status) {
+        std::cout << "Error creating update follower thread" << std::endl;
+    }
 }
 
 /**

@@ -11,6 +11,7 @@
 #include "messages.hpp"
 #include <map>
 #include <string>
+#include <pthread.h>
 
 static const int BROADCAST_CHANNEL = 200;
 static const int DEFAULT_PORT = 50001;
@@ -31,10 +32,22 @@ public:
     void followRequest(std::string vehicleIp);
     void followResponse();
     void stopFollow();
+
+    pthread_t leaderStatusThread;
+    pthread_t followerStatusThread;
+    
+    uint32_t lastFollowerUpdate;
+    uint32_t lastLeaderUpdate;
+
+    void startReportingToFollower();
     void leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled);
+
+    void startReportingToLeader();
     void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
 
     std::map<std::string, std::string> getMapOfIps();
+    
+    static uint32_t getTime();
 
 private:
     std::map<std::string, std::string> mapOfIps;
@@ -50,7 +63,6 @@ private:
     std::shared_ptr<cluon::UDPSender>   toLeader;
     std::shared_ptr<cluon::UDPSender>   toFollower;
 
-    static uint32_t getTime();
     static std::pair<int16_t, std::string> extract(std::string data);
     template <class T>
     static std::string encode(T msg);

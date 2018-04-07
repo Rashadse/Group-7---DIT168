@@ -11,7 +11,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     myIp = ip;
     myGroupId = groupId;
     
-    /*          
+    /*
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This is where
      * AnnouncePresence messages will be received.
      */

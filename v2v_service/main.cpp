@@ -1,29 +1,42 @@
 #include <iostream>
-#include <set>
-#include "v2v/v2v.hpp"
 #include <map>
-#include <pthread.h>
+#include <fstream>
+#include <string>
+
+#include "v2v/v2v.hpp"
+
 
 using namespace std;
 int main(int /*argc*/, char** /*argv*/) {
-    shared_ptr<V2VService> v2vService = make_shared<V2VService>("192.168.0.41", "6");
+    string ip;
+    ifstream ip_file ("../ip.txt");
+    if (ip_file.is_open()) {
+        getline(ip_file, ip);
+        ip_file.close();
+        cout << ip << " = CURRENT IP ADDRESS" << endl;
+    } else {
+        cout << "Failed to read IP address" << endl;
+        exit(1);
+    }
+    
+    shared_ptr<V2VService> v2vService = make_shared<V2VService>(ip, "7");
 
     while (true) {
         unsigned int choice;
-        cout << "Which message would you like to send?" << std::endl;
-        cout << "(1) AnnouncePresence" << std::endl;
-        cout << "(2) FollowRequest" << std::endl;
-        cout << "(3) FollowResponse" << std::endl;
-        cout << "(4) StopFollow" << std::endl;
-        cout << "(5) LeaderStatus" << std::endl;
-        cout << "(6) FollowerStatus" << std::endl;
-        cout << "(7) AnnouncedIps" << std::endl;
-        cout << "(#) Nothing, just quit." << std::endl;
+        cout << "Which message would you like to send?" << endl;
+        cout << "(1) AnnouncePresence" << endl;
+        cout << "(2) FollowRequest" << endl;
+        cout << "(3) FollowResponse" << endl;
+        cout << "(4) StopFollow" << endl;
+        cout << "(5) LeaderStatus" << endl;
+        cout << "(6) FollowerStatus" << endl;
+        cout << "(7) AnnouncedIps" << endl;
+        cout << "(#) Nothing, just quit." << endl;
         cout << ">> ";
         cin >> choice;
         
         
-        map<std::string, std::string> myMap = v2vService->getMapOfIps();
+        map<string, string> myMap = v2vService->getMapOfIps();
         std::string groupId = "";
         switch (choice) {
             case 1: v2vService->announcePresence(); break;

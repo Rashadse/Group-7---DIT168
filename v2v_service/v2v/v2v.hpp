@@ -25,6 +25,16 @@ static const int STOP_FOLLOW = 1004;
 static const int LEADER_STATUS = 2001;
 static const int FOLLOWER_STATUS = 3001;
 
+//internals
+static const int INTERNAL_BROADCAST_CHANNEL = 201;
+static const int INTERNAL_FOLLOW_REQUEST = 4000;
+static const int INTERNAL_FOLLOW_RESPONSE = 4001;
+static const int INTERNAL_STOP_FOLLOW_REQUEST = 4002;
+static const int INTERNAL_STOP_FOLLOW_RESPONSE = 4003;
+static const int INTERNAL_GET_ALL_GROUPS_REQUEST = 4004;
+static const int INTERNAL_GET_ALL_GROUPS_RESPONSE = 4005;
+static const int INTERNAL_INTERNAL_EMERGENCY_BRAKE = 4006;
+
 
 class V2VService {
 public:
@@ -57,7 +67,8 @@ private:
 
     std::string myIp;
     std::string myGroupId;
-
+    
+    std::shared_ptr<cluon::OD4Session> internalBroadCast;
     std::shared_ptr<cluon::OD4Session>  broadcast;
     std::shared_ptr<cluon::UDPReceiver> incoming;
     std::shared_ptr<cluon::UDPSender>   toLeader;

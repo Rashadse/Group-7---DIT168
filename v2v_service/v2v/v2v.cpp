@@ -36,6 +36,56 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
                 }
             });
+    
+    /*        
+    //internal communication
+    internalBroadCast = std::make_shared<cluon::OD4Session>(
+        INTERNAL_BROADCAST_CHANNEL,
+        [this](cluon::data::Envelope &&envelope) noexcept {
+            std::cout <<"[module name]";
+            switch (envelope.datatype()) {
+                case FOLLOW_REQUEST: {
+                        FollowRequest followRequest = decode<FollowRequest>(msg.second);
+                        std::cout << "received '" << followRequest.LongName()
+                                   << "' from '" << senderIp << "'!" << std::endl;
+
+                         // After receiving a FollowRequest, check first if there is currently no car already following.
+                         if (followerIp.empty()) {
+                             followerIp = senderIp; // If no, add the requester to known follower slot and establish a
+                             // sending channel.
+                             toFollower = std::make_shared<cluon::UDPSender>(followerIp, DEFAULT_PORT);
+                             followResponse();
+                             
+                             startReportingToFollower();
+                         }
+                         break;
+                     }
+                     case FOLLOW_RESPONSE: {
+                         FollowResponse followResponse = decode<FollowResponse>(msg.second);
+                         std::cout << "received '" << followResponse.LongName()
+                                   << "' from '" << senderIp << "'!" << std::endl;
+
+                        startReportingToLeader();
+
+                         break;
+                     }
+                     case STOP_FOLLOW: {
+                         StopFollow stopFollow = decode<StopFollow>(msg.second);
+                         std::cout << "received '" << stopFollow.LongName()
+                                   << "' from '" << senderIp << "'!" << std::endl;
+
+                         // Clear either follower or leader slot, depending on current role.
+                         if (senderIp == followerIp) {
+                             followerIp = "";
+                             toFollower.reset();
+                         }
+                         else if (senderIp == leaderIp) {
+                             leaderIp = "";
+                             toLeader.reset();
+                         }
+                         break;
+                     }
+    */
 
     /*
      * Each car declares an incoming UDPReceiver for messages directed at them specifically. This is where messages

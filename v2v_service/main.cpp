@@ -30,29 +30,32 @@ int main(int /*argc*/, char** /*argv*/) {
         cout << "(4) StopFollow" << endl;
         cout << "(5) LeaderStatus" << endl;
         cout << "(6) FollowerStatus" << endl;
-        cout << "(7) AnnouncedIps" << endl;
+        cout << "UTILITY AND TESTING" << endl;
+        cout << "(7) List all announced IPs" << endl;
+        cout << "(8) V2VService Health check" << endl;
         cout << "(#) Nothing, just quit." << endl;
         cout << ">> ";
         cin >> choice;
         
         
-        map<string, string> myMap = v2vService->getMapOfIps();
+        map<string, string> ipMap;
         std::string groupId = "";
         switch (choice) {
             case 1: v2vService->announcePresence(); break;
             case 2:
-                if (myMap.size() < 1) {
+                ipMap = v2vService->getMapOfIps();
+                if (ipMap.size() < 1) {
                     cout << "There are no IPs to choose from, wait for someone to announce themselves!" << endl;
                     break;
                 }
                 
                 cout << "Which vehicle would you like to follow?" << endl;
-                for(std::map<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
+                for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
                     cout << it->first << " " << it->second << endl;
                 }
                 cin >> groupId;
                 cout << "You chose: " << groupId << endl;
-                v2vService->followRequest(myMap[groupId]);
+                v2vService->followRequest(ipMap[groupId]);
                 
                 break;
             case 3: v2vService->followResponse(); break;
@@ -60,9 +63,12 @@ int main(int /*argc*/, char** /*argv*/) {
             case 5: v2vService->leaderStatus(50, 0, 100); break;
             case 6: v2vService->followerStatus(50, 0, 10, 100); break;
             case 7:
-                for(std::map<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
+                for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
                     cout << it->first << " " << it->second << endl;
                 }
+                break;
+            case 8:
+                v2vService->healthCheck();
                 break;
             default: return 0;
         }    

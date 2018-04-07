@@ -4,14 +4,16 @@
 #include <iomanip>
 #include <unistd.h>
 #include <sys/time.h>
+#include <map>
+#include <string>
+#include <pthread.h>
+
 #include "cluon/OD4Session.hpp"
 #include "cluon/UDPSender.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/Envelope.hpp"
 #include "messages.hpp"
-#include <map>
-#include <string>
-#include <pthread.h>
+
 
 static const int BROADCAST_CHANNEL = 200;
 static const int DEFAULT_PORT = 50001;
@@ -33,15 +35,6 @@ public:
     void followResponse();
     void stopFollow();
 
-    std::string leaderIp;
-    std::string followerIp;
-
-    pthread_t leaderStatusThread;
-    pthread_t followerStatusThread;
-    
-    uint32_t lastFollowerUpdate;
-    uint32_t lastLeaderUpdate;
-
     void startReportingToFollower();
     void leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled);
 
@@ -49,8 +42,15 @@ public:
     void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
 
     std::map<std::string, std::string> getMapOfIps();
+    void healthCheck();
     
     static uint32_t getTime();
+
+    std::string leaderIp;
+    std::string followerIp;
+
+    uint32_t lastFollowerUpdate;
+    uint32_t lastLeaderUpdate;
 
 private:
     std::map<std::string, std::string> mapOfIps;

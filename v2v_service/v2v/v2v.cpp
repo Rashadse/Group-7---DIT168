@@ -176,7 +176,7 @@ void V2VService::stopFollow() {
 void *sendFollowerStatuses(void *v2v) {
     V2VService *v2vservice;
     v2vservice = (V2VService *)v2v;
-    std::cout << "Update leader thread started with ID: " << v2vservice->followerStatusThread << std::endl;
+    std::cout << "Update leader thread started!" << std::endl;
 
     using namespace std::chrono_literals;
     while (!v2vservice->leaderIp.empty()) {
@@ -195,7 +195,8 @@ void V2VService::startReportingToLeader() {
     lastLeaderUpdate = getTime();
 
     int status;
-    status = pthread_create(&followerStatusThread, NULL, sendFollowerStatuses, (void *)this);
+    pthread_t threadId;
+    status = pthread_create(&threadId, NULL, sendFollowerStatuses, (void *)this);
     
     // pthread_create returns 1 if an error occured.
     if (status) {
@@ -226,7 +227,7 @@ void V2VService::followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t di
 void *sendLeaderStatuses(void *v2v) {
     V2VService *v2vservice;
     v2vservice = (V2VService *)v2v;
-    std::cout << "Update follower thread started with ID: " << v2vservice->leaderStatusThread << std::endl;
+    std::cout << "Update follower thread started!" << std::endl;
     
     using namespace std::chrono_literals;
     while (!v2vservice->followerIp.empty()) {
@@ -245,7 +246,8 @@ void V2VService::startReportingToFollower() {
     lastFollowerUpdate = getTime();
 
     int status;
-    status = pthread_create(&leaderStatusThread, NULL, sendLeaderStatuses, (void *)this);
+    pthread_t threadId;
+    status = pthread_create(&threadId, NULL, sendLeaderStatuses, (void *)this);
     
     // pthread_create returns 1 if an error occured.
     if (status) {
@@ -277,6 +279,23 @@ void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t dist
  */
 std::map<std::string, std::string> V2VService::getMapOfIps(){
     return mapOfIps;
+}
+
+void V2VService::healthCheck() {
+    std::map<std::string, std::string> ipMap = getMapOfIps();
+    std::cout << "V2VService health check" << std::endl;
+    std::cout << "<<<<<<<<<<<<>>>>>>>>>>>>>" << std::endl;
+    std::cout << "GroupID: " << myGroupId << "IP-address: " << myIp << std::endl;
+    std::cout << "-------------------------" << std::endl;
+    std::cout << "Current Time: " << getTime() << std::endl;
+    std::cout << "-------------------------" << std::endl;
+    std::cout << "Follower:     " << followerIp << std::endl;
+    std::cout << "Leader:       " << leaderIp << std::endl;
+    std::cout << "-------------------------" << std::endl;
+    std::cout << "Announced:    " << followerIp << std::endl;
+    for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
+        std::cout << "    Group: " << it->first << " IP: " << it->second << std::endl;
+    }
 }
 
 /**

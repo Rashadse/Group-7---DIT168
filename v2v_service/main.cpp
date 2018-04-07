@@ -9,7 +9,7 @@
 using namespace std;
 int main(int /*argc*/, char** /*argv*/) {
     string ip;
-    ifstream ip_file ("../ip.txt");
+    ifstream ip_file ("ip.txt");
     if (ip_file.is_open()) {
         getline(ip_file, ip);
         ip_file.close();

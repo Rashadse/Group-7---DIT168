@@ -1,12 +1,13 @@
-#include "roboticscape.h"
+#include <rc_usefulincludes.h>
+#include <roboticscape.h>
 #include <iostream>
 
 int main() {
-    if(rc_initialize()){
-        std::cout << "BLINK YOU ****" << std::endl;
+
+    if (rc_initialize()) {
         return -1;
     }
-    rc_blink();
+    std::cout << "BLINK YOU ****" << std::endl;
 
     rc_cleanup();
 }

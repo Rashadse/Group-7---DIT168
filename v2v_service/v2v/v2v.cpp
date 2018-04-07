@@ -26,7 +26,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                                   << ap.vehicleIp() << "', GroupID '"
                                   << ap.groupId() << "'!" << std::endl;                              
                         
-                        if (ap.groupId() !=myGroupId) {
+                        if (ap.groupId() != myGroupId) {
                             mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
                         }
                         
@@ -69,7 +69,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          std::cout << "received '" << followResponse.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
 
-                         /* TODO: implement NTP synchronisation */
+                        
 
                          break;
                      }

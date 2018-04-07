@@ -9,7 +9,6 @@
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/Envelope.hpp"
 #include "messages.hpp"
-#include <set>
 #include <map>
 #include <string>
 
@@ -35,16 +34,10 @@ public:
     void leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled);
     void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
 
-    std::set<std::string> getAnnouncedIps();
-    //getting the map
     std::map<std::string, std::string> getMapOfIps();
-    //end of map
 
 private:
-    std::set<std::string> announcedIps;
-    //creating a map
     std::map<std::string, std::string> mapOfIps;
-    //end of map
 
     std::string myIp;
     std::string myGroupId;

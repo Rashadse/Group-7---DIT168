@@ -84,6 +84,7 @@ private:
     CarStatus currentCarStatus;
 
     std::map<std::string, std::string> mapOfIps;
+    std::map<std::string, std::string> mapOfIds;
 
     std::string myIp;
     std::string myGroupId;

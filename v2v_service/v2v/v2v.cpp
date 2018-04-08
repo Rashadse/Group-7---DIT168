@@ -32,7 +32,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         
                         // Filter out yourself from announcement
                         if (ap.groupId() != myGroupId) {
-                            mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));          
+                            mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));   
+                            mapOfIds[ap.vehicleIp()] = ap.groupId();       
                         }
                         
                         break;
@@ -156,7 +157,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
                         startReportingToLeader();
                         InternalFollowResponse msg;
-                        msg.groupid(mapOfIps[senderIp]);
+                        msg.groupid("0");
                         msg.status(1);
                         internalBroadCast->send(msg);
                         

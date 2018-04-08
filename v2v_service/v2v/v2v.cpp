@@ -208,7 +208,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
                         std::cout << "received '" << leaderStatus.LongName()
                                   << "' from '" << senderIp << "'!" << std::endl;
-                        std::cout << "New speed = " << leaderStatus.speed() << std::endl;
+                        std::cout << "New speed = " << unsigned(leaderStatus.speed()) << std::endl;
 
                         opendlv::proxy::GroundSteeringReading steeringMsg;
                         opendlv::proxy::PedalPositionReading speedMsg;

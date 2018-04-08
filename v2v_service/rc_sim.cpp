@@ -82,6 +82,7 @@ int main() {
         cout << "(4) InternalEmergencyBrake" << endl;
         cout << "(5) Pump the gas!" << endl;
         cout << "(6) Veer to the side!" << endl;
+        cout << "(7) Announce your presence!" << endl;
         cout << "(#) Nothing, just quit." << endl;
         cout << ">> ";
         cin >> choice;
@@ -132,6 +133,11 @@ int main() {
                 GroundSteeringReading msg;
                 msg.steeringAngle(10.0);
                 motorBroadcast->send(msg);
+                break;
+            }
+            case 7: {
+                InternalAnnouncePresence msg;
+                internalBroadcast->send(msg);
                 break;
             }
             default: return 0;

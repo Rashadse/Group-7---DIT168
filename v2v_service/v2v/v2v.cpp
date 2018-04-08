@@ -53,57 +53,62 @@ V2VService::V2VService(std::string ip, std::string groupId) {
             
             
             switch (envelope.dataType()) {
+                case INTERNAL_ANNOUNCE_PRESENCE: {
+                    std::cout << "Announcing presence!" << std::endl;
+                    announcePresence();
+                    break;
+                }
                 case INTERNAL_FOLLOW_REQUEST: {
-                        InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
-                        if (leaderIp.empty()){
-                            followRequest(mapOfIps[msg.groupid()]);                            
-                        }                      
-                        std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
+                    InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
+                    if (leaderIp.empty()){
+                        followRequest(mapOfIps[msg.groupid()]);                            
+                    }                      
+                    std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
 
                     break;
                  }
                  case INTERNAL_STOP_FOLLOW_REQUEST: {
-                         InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
-                         std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
-                         stopFollow();
-                         InternalStopFollowResponse retmsg;
-                         retmsg.groupid(msg.groupid());
-                         internalBroadCast->send(retmsg);
+                     InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
+                     std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
+                     stopFollow();
+                     InternalStopFollowResponse retmsg;
+                     retmsg.groupid(msg.groupid());
+                     internalBroadCast->send(retmsg);
 
                      break;
                  }
                  case INTERNAL_GET_ALL_GROUPS_REQUEST: {
-                        InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
-                        std::map<std::string, std::string> ipMap = getMapOfIps();
-                        for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
-                            InternalGetAllGroupsResponse msg;
-                            msg.groupid(it->first);
-                            internalBroadCast->send(msg);
-                        }
-                     break;
-                 }
-                 case INTERNAL_EMERGENCY_BRAKE: {
-                     InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
-                     //Terminate communication
-                     stopFollow();
-                     
-                     //Set steering and position to 0
-                     opendlv::proxy::PedalPositionReading pedalMsg;
-                     pedalMsg.percent(0);
-                     motorBroadcast->send(pedalMsg);
-                     opendlv::proxy::GroundSteeringReading steeringMsg;
-                     steeringMsg.steeringAngle(0);
-                     motorBroadcast->send(steeringMsg);
-                     
-                     std::cout << "received '" << msg.LongName() << std::endl;
-
-                     break;
-                 }
-                 default: 
+                     InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
+                     std::map<std::string, std::string> ipMap = getMapOfIps();
+                     for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
+                        InternalGetAllGroupsResponse msg;
+                        msg.groupid(it->first);
+                        internalBroadCast->send(msg);
+                     }
+                break;
+                }
+                case INTERNAL_EMERGENCY_BRAKE: {
+                    InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
+                    //Terminate communication
+                    stopFollow();
+                    
+                    //Set steering and position to 0
+                    opendlv::proxy::PedalPositionReading pedalMsg;
+                    pedalMsg.percent(0);
+                    motorBroadcast->send(pedalMsg);
+                    opendlv::proxy::GroundSteeringReading steeringMsg;
+                    steeringMsg.steeringAngle(0);
+                    motorBroadcast->send(steeringMsg);
+                    
+                    std::cout << "received '" << msg.LongName() << std::endl;
+                    break;
+                }
+                default: 
                     std::cout << "¯\\_(ツ)_/¯" << std::endl;
                     break;
-             }
-         });
+            }
+         }
+    );
     
     motorBroadcast = std::make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
@@ -195,6 +200,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          std::cout << "received '" << followerStatus.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
                          
+                         // Prepared for followed updates, but not acting upon them, because why would we?...
                         /*opendlv::proxy::GroundSteeringReading steeringMsg;
                         opendlv::proxy::PedalPostitionReading speedMsg;
                         steeringMsg.steeringAngle(followerStatus.steeringAngle());

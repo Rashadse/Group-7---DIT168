@@ -19,7 +19,7 @@ int main(int /*argc*/, char** /*argv*/) {
         exit(1);
     }
     
-    shared_ptr<V2VService> v2vService = make_shared<V2VService>(ip, "6");
+    shared_ptr<V2VService> v2vService = make_shared<V2VService>(ip, "7");
 
     while (true) {
         unsigned int choice;

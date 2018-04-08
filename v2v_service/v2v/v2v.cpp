@@ -50,6 +50,9 @@ V2VService::V2VService(std::string ip, std::string groupId) {
             switch (envelope.dataType()) {
                 case INTERNAL_FOLLOW_REQUEST: {
                         InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
+                        if (leaderIp.empty()){
+                            followRequest(mapOfIps[msg.groupid()]);                            
+                        }                      
                         std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
 
                     break;
@@ -57,6 +60,10 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                  case INTERNAL_STOP_FOLLOW_REQUEST: {
                          InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
                          std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
+                         stopFollow();
+                         InternalStopFollowResponse retmsg;
+                         retmsg.groupid(msg.groupid());
+                         internalBroadCast->send(retmsg);
 
                      break;
                  }
@@ -144,7 +151,11 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                                    << "' from '" << senderIp << "'!" << std::endl;
 
                         startReportingToLeader();
-
+                        InternalFollowResponse msg;
+                        msg.groupid(mapOfIps[senderIp]);
+                        msg.status(1);
+                        internalBroadCast->send(msg);
+                        
                          break;
                      }
                      case STOP_FOLLOW: {

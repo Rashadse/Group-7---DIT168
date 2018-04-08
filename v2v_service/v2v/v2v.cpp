@@ -157,7 +157,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
                         startReportingToLeader();
                         InternalFollowResponse msg;
-                        msg.groupid(mapofIds[senderIp]);
+                        msg.groupid(mapOfIds[senderIp]);
                         msg.status(1);
                         internalBroadCast->send(msg);
                         

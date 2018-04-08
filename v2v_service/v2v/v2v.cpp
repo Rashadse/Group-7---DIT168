@@ -84,6 +84,17 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                  }
                  case INTERNAL_EMERGENCY_BRAKE: {
                      InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
+                     //Terminate communication
+                     stopFollow();
+                     
+                     //Set steering and position to 0
+                     opendlv::proxy::PedalPositionReading pedalMsg;
+                     pedalMsg.percent(0);
+                     motorBroadcast->send(pedalMsg);
+                     opendlv::proxy::GroundSteeringReading steeringMsg;
+                     steeringMsg.steeringAngle(0);
+                     motorBroadcast->send(steeringMsg);
+                     
                      std::cout << "received '" << msg.LongName() << std::endl;
 
                      break;

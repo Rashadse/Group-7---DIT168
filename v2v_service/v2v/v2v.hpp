@@ -14,7 +14,7 @@
 #include "cluon/Envelope.hpp"
 #include "messages.hpp"
 
-
+// V2V external
 static const int BROADCAST_CHANNEL = 200;
 static const int DEFAULT_PORT = 50001;
 
@@ -25,15 +25,22 @@ static const int STOP_FOLLOW = 1004;
 static const int LEADER_STATUS = 2001;
 static const int FOLLOWER_STATUS = 3001;
 
-//internals
+// STS internal
 static const int INTERNAL_BROADCAST_CHANNEL = 201;
+
 static const int INTERNAL_FOLLOW_REQUEST = 4000;
 static const int INTERNAL_FOLLOW_RESPONSE = 4001;
 static const int INTERNAL_STOP_FOLLOW_REQUEST = 4002;
 static const int INTERNAL_STOP_FOLLOW_RESPONSE = 4003;
 static const int INTERNAL_GET_ALL_GROUPS_REQUEST = 4004;
 static const int INTERNAL_GET_ALL_GROUPS_RESPONSE = 4005;
-static const int INTERNAL_INTERNAL_EMERGENCY_BRAKE = 4006;
+static const int INTERNAL_EMERGENCY_BRAKE = 4006;
+
+// Motor Proxy
+static const int MOTOR_BROADCAST_CHANNEL = 111;
+
+static const int PEDAL_POSITION_READING = 1041;
+static const int GROUND_STEERING_READING = 1045;
 
 
 class V2VService {
@@ -68,8 +75,10 @@ private:
     std::string myIp;
     std::string myGroupId;
     
-    std::shared_ptr<cluon::OD4Session> internalBroadCast;
+    std::shared_ptr<cluon::OD4Session>  motorBroadcast;
+    std::shared_ptr<cluon::OD4Session>  internalBroadCast;
     std::shared_ptr<cluon::OD4Session>  broadcast;
+    
     std::shared_ptr<cluon::UDPReceiver> incoming;
     std::shared_ptr<cluon::UDPSender>   toLeader;
     std::shared_ptr<cluon::UDPSender>   toFollower;

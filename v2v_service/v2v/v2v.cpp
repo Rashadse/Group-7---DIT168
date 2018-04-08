@@ -33,7 +33,9 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         
                         break;
                     }
-                    default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                    default: 
+                        std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                        break;
                 }
             });
     
@@ -86,6 +88,32 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          break;
                      }
     */
+    
+    motorBroadcast = std::make_shared<cluon::OD4Session>(
+        MOTOR_BROADCAST_CHANNEL,
+        [this](cluon::data::Envelope &&envelope) noexcept {
+            std::cout << "[MOTOR] ";
+            
+            using namespace opendlv::proxy;
+            switch (envelope.dataType()) {
+                case PEDAL_POSITION_READING: {
+                    PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
+                    
+                    std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+                    break;
+                }
+                case GROUND_STEERING_READING: {
+                    GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
+                    
+                    std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+                    break;
+                }
+                default:
+                    std::cout << "Could not understand message" << std::endl;
+                    break;
+            }
+        }
+    );
 
     /*
      * Each car declares an incoming UDPReceiver for messages directed at them specifically. This is where messages

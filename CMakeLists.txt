@@ -31,6 +31,9 @@ include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 add_executable(${PROJECT_NAME}-V2VService ${V2V_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${V2V_DIR}/v2v/v2v.cpp)
 target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
 
+add_executable(${PROJECT_NAME}-RC_SIMULATOR ${V2V_DIR}/rc_sim.cpp ${CMAKE_BINARY_DIR}/messages.cpp)
+target_link_libraries(${PROJECT_NAME}-RC_SIMULATOR ${CLUON_LIBRARIES})
+
 # Testing
 #enable_testing()
 #add_executable(${PROJECT_NAME}-test ${TEST_DIR}/UnitTests.cpp <File to test>)

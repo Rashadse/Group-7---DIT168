@@ -10,6 +10,10 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     leaderIp = "";
     myIp = ip;
     myGroupId = groupId;
+    currentCarStatus.speed = 0;
+    currentCarStatus.steeringAngle = 0;
+    currentCarStatus.distanceFront = 0;
+    currentCarStatus.distanceTraveled = 0;
     
     /*
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This is where
@@ -98,14 +102,14 @@ V2VService::V2VService(std::string ip, std::string groupId) {
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
-                    
                     std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+                    currentCarStatus.speed = (uint8_t) msg.percent();
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
-                    
                     std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+                    currentCarStatus.steeringAngle = (uint8_t) msg.steeringAngle();
                     break;
                 }
                 default:
@@ -263,9 +267,15 @@ void *sendFollowerStatuses(void *v2v) {
     using namespace std::chrono_literals;
     while (!v2vservice->leaderIp.empty()) {
         // Get sensor data
+        CarStatus *currentCarStatus = v2vservice->getCurrentCarStatus();
         
         // Send sensor data
-        v2vservice->followerStatus(0, 0, 0, 0);
+        v2vservice->followerStatus(
+            currentCarStatus->speed,
+            currentCarStatus->steeringAngle,
+            currentCarStatus->distanceFront,
+            currentCarStatus->distanceTraveled
+        );
         std::this_thread::sleep_for(500ms);
     }
 
@@ -314,9 +324,13 @@ void *sendLeaderStatuses(void *v2v) {
     using namespace std::chrono_literals;
     while (!v2vservice->followerIp.empty()) {
         // Get sensor data
-    
+        CarStatus *currentCarStatus = v2vservice->getCurrentCarStatus();
         // Send sensor data
-        v2vservice->leaderStatus(0, 0, 0);
+        v2vservice->leaderStatus(
+            currentCarStatus->speed,
+            currentCarStatus->steeringAngle,
+            currentCarStatus->distanceTraveled
+        );
         std::this_thread::sleep_for(500ms);
     }
     
@@ -363,13 +377,28 @@ std::map<std::string, std::string> V2VService::getMapOfIps() {
     return mapOfIps;
 }
 
+CarStatus *V2VService::getCurrentCarStatus() {
+    return &currentCarStatus;
+}
+
+CarStatus *V2VService::setCurrentCarStatus(struct CarStatus *newCarStatus) {
+    currentCarStatus.speed = newCarStatus->speed;
+    currentCarStatus.steeringAngle = newCarStatus->steeringAngle;
+    currentCarStatus.distanceTraveled = newCarStatus->distanceTraveled;
+    currentCarStatus.distanceFront = newCarStatus->distanceFront;
+    return &currentCarStatus;
+}
+
 void V2VService::healthCheck() {
     std::map<std::string, std::string> ipMap = getMapOfIps();
+    CarStatus *status = getCurrentCarStatus();
     std::cout << "V2VService health check" << std::endl;
-    std::cout << "<<<<<<<<<<<<>>>>>>>>>>>>>" << std::endl;
+    std::cout << "-------------------------" << std::endl;
     std::cout << "GroupID: " << myGroupId << " IP-address: " << myIp << std::endl;
     std::cout << "-------------------------" << std::endl;
     std::cout << "Current Time: " << getTime() << std::endl;
+    std::cout << "Current speed:" << unsigned(status->speed) << std::endl;
+    std::cout << "Current angle:" << unsigned(status->steeringAngle) << std::endl;
     std::cout << "-------------------------" << std::endl;
     std::cout << "Follower:     " << followerIp << std::endl;
     std::cout << "Leader:       " << leaderIp << std::endl;
@@ -378,6 +407,7 @@ void V2VService::healthCheck() {
     for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
         std::cout << "    Group: " << it->first << " IP: " << it->second << std::endl;
     }
+    std::cout << "-------------------------" << std::endl;
 }
 
 /**

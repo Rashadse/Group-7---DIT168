@@ -42,21 +42,21 @@ int main(int /*argc*/, char** /*argv*/) {
 				// A variable used to increment/decrement the percentage of the speed pedal
                 const int aLittleSpeed = 0.3;
                 
-				const int pedalPercentage = 0;
+				int pedalPercentage = 0;
 				
 				// A variable used as a condition for the while loop to know when to quit the remote control UI
 				bool loop = true;
 
                 while (true) {
 
-                unsigned int direction;
+                string direction;
 
-                cin >> direction;
+                std::cin >> direction;
 
                 switch (direction) {
 
                     // accelerates
-                    case w: 
+                    case 'w': 
                         
                         std::cout << "Accelerate" << std::endl;
                         msgSteering.steeringAngle(0.0);
@@ -70,7 +70,7 @@ int main(int /*argc*/, char** /*argv*/) {
                          
                          break;
                      
-                     case s: 
+                     case 's': 
                          
                         std::cout << "Decelerate" << std::endl;
                         msgSteering.steeringAngle(0.0);
@@ -84,8 +84,8 @@ int main(int /*argc*/, char** /*argv*/) {
 
                          break;
                      
-                     case a: 
-                        std::cout << "Turn left" << std::endl;
+                     case 'a': 
+                        std::cout << "Turning left" << std::endl;
                         //the car should slow down before turning if the speed is over 20%.
                         if (PedalPercentage >= 0.2){
                         pedalPercentage = 0.2;}
@@ -95,8 +95,8 @@ int main(int /*argc*/, char** /*argv*/) {
                          
                          break;
                      
-                     case d: 
-                        std::cout << "Turn right" << std::endl;
+                     case 'd': 
+                        std::cout << "Turning right" << std::endl;
                         //the car should slow down before turning if the speed is over 20%.
                         if (PedalPercentage >= 0.2){
                         pedalPercentage = 0.2;}
@@ -106,7 +106,7 @@ int main(int /*argc*/, char** /*argv*/) {
 
                          break;
                      
-                     case x: 
+                     case 'x': 
                         std::cout << "Emergency Stopping" << std::endl;
                         pedalPercentage = 0.0;
                         od4.send(msgPedal);

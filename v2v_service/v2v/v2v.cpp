@@ -1,6 +1,6 @@
 #include <iostream>
 #include "v2v.hpp"
-
+#include <map>
 
 /**
  * Implementation of the V2VService class as declared in v2v.hpp
@@ -50,6 +50,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
         [this](cluon::data::Envelope &&envelope) noexcept {
             std::cout <<"[INTERNAL BR] ";
             
+            
             switch (envelope.dataType()) {
                 case INTERNAL_FOLLOW_REQUEST: {
                         InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
@@ -64,9 +65,13 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                      break;
                  }
                  case INTERNAL_GET_ALL_GROUPS_REQUEST: {
-                     InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
-                     std::cout << "received '" << msg.LongName() << std::endl;
-
+                        InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
+                        std::map<std::string, std::string> ipMap = getMapOfIps();
+                        for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
+                            InternalGetAllGroupsResponse msg;
+                            msg.groupid(it->first);
+                            internalBroadCast->send(msg);
+                        }
                      break;
                  }
                  case INTERNAL_EMERGENCY_BRAKE: {

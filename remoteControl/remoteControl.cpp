@@ -27,18 +27,25 @@ int main(int /*argc*/, char** /*argv*/) {
         std::cout << "ERROR: No od4 running!!!" << std::endl;
         return -1;
     }
-
-    std::cout << "Use W,A,S,D to control the car" << std::endl;
-
-    opendlv::proxy::GroundSteeringReading msgSteering;
+	
+	opendlv::proxy::GroundSteeringReading msgSteering;
     opendlv::proxy::PedalPositionReading msgPedal;
 
-    const int delay = 1000;
 
+    std::cout << "To control the car use" << std::endl;
+	std::cout << "           W          " << std::endl;
+	std::cout << "    A             D   " << std::endl;
+	std::cout << "           S          " << std::endl;
+	std::cout << "Press X to emergency stop and quit" << std::endl;
 
-
-                const int aLittleSpeed = 0.05;
-                const int pedalPercentage;
+				
+				// A variable used to increment/decrement the percentage of the speed pedal
+                const int aLittleSpeed = 0.3;
+                
+				const int pedalPercentage = 0;
+				
+				// A variable used as a condition for the while loop to know when to quit the remote control UI
+				bool loop = true;
 
                 while (true) {
 
@@ -49,7 +56,7 @@ int main(int /*argc*/, char** /*argv*/) {
                 switch (direction) {
 
                     // accelerates
-                    case w: {
+                    case w: 
                         
                         std::cout << "Accelerate" << std::endl;
                         msgSteering.steeringAngle(0.0);
@@ -60,12 +67,10 @@ int main(int /*argc*/, char** /*argv*/) {
                         }
                         msgPedal.percent(PedalPercentage);
                         od4.send(msgPedal);
-
-
-                         }
+                         
                          break;
-                     }
-                     case s: {
+                     
+                     case s: 
                          
                         std::cout << "Decelerate" << std::endl;
                         msgSteering.steeringAngle(0.0);
@@ -78,8 +83,8 @@ int main(int /*argc*/, char** /*argv*/) {
                         od4.send(msgPedal);
 
                          break;
-                     }
-                     case a: {
+                     
+                     case a: 
                         std::cout << "Turn left" << std::endl;
                         //the car should slow down before turning if the speed is over 20%.
                         if (PedalPercentage >= 0.2){
@@ -87,11 +92,10 @@ int main(int /*argc*/, char** /*argv*/) {
                         od4.send(msgPedal);
                         msgSteering.steeringAngle(-15.0);
                         od4.send(msgSteering);
-                        
-                         }
+                         
                          break;
-                     }
-                     case d: {
+                     
+                     case d: 
                         std::cout << "Turn right" << std::endl;
                         //the car should slow down before turning if the speed is over 20%.
                         if (PedalPercentage >= 0.2){
@@ -101,18 +105,25 @@ int main(int /*argc*/, char** /*argv*/) {
                         od4.send(msgSteering);
 
                          break;
-                     }
-                     case x: {
-                        std::cout << "Emergency Stop" << std::endl;
+                     
+                     case x: 
+                        std::cout << "Emergency Stopping" << std::endl;
                         pedalPercentage = 0.0;
                         od4.send(msgPedal);
                         msgSteering.steeringAngle(0.0);
                         od4.send(msgSteering);
-
+						std::cout << "quitting" << std::endl;
+						loop = false;
                          break;
-                     }
-                     default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                     
+                     default: 
+						cout << "wrong command, the car will now stop"<< endl;
+						pedalPercentage = 0.0;
+						od4.send(msgPedal);
+						msgSteering.steeringAngle(0.0);
+						od4.send(msgSteering);
                  }
+			}
+		}
 
-    return 0;
 

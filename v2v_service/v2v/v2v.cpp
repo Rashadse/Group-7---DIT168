@@ -65,6 +65,12 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
                      break;
                  }
+                 case INTERNAL_EMERGENCY_BRAKE: {
+                     InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
+                     std::cout << "received '" << msg.LongName() << std::endl;
+
+                     break;
+                 }
                  default: 
                     std::cout << "¯\\_(ツ)_/¯" << std::endl;
                     break;

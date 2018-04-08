@@ -39,55 +39,37 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
             });
     
-    /*        
+            
     //internal communication
     internalBroadCast = std::make_shared<cluon::OD4Session>(
         INTERNAL_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            std::cout <<"[module name]";
-            switch (envelope.datatype()) {
-                case FOLLOW_REQUEST: {
-                        FollowRequest followRequest = decode<FollowRequest>(msg.second);
-                        std::cout << "received '" << followRequest.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
+            std::cout <<"[INTERNAL BR] ";
+            
+            switch (envelope.dataType()) {
+                case INTERNAL_FOLLOW_REQUEST: {
+                        InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
+                        std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
 
-                         // After receiving a FollowRequest, check first if there is currently no car already following.
-                         if (followerIp.empty()) {
-                             followerIp = senderIp; // If no, add the requester to known follower slot and establish a
-                             // sending channel.
-                             toFollower = std::make_shared<cluon::UDPSender>(followerIp, DEFAULT_PORT);
-                             followResponse();
-                             
-                             startReportingToFollower();
-                         }
-                         break;
-                     }
-                     case FOLLOW_RESPONSE: {
-                         FollowResponse followResponse = decode<FollowResponse>(msg.second);
-                         std::cout << "received '" << followResponse.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
+                    break;
+                 }
+                 case INTERNAL_STOP_FOLLOW_REQUEST: {
+                         InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
+                         std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
 
-                        startReportingToLeader();
+                     break;
+                 }
+                 case INTERNAL_GET_ALL_GROUPS_REQUEST: {
+                     InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
+                     std::cout << "received '" << msg.LongName() << std::endl;
 
-                         break;
-                     }
-                     case STOP_FOLLOW: {
-                         StopFollow stopFollow = decode<StopFollow>(msg.second);
-                         std::cout << "received '" << stopFollow.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
-
-                         // Clear either follower or leader slot, depending on current role.
-                         if (senderIp == followerIp) {
-                             followerIp = "";
-                             toFollower.reset();
-                         }
-                         else if (senderIp == leaderIp) {
-                             leaderIp = "";
-                             toLeader.reset();
-                         }
-                         break;
-                     }
-    */
+                     break;
+                 }
+                 default: 
+                    std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                    break;
+             }
+         });
     
     motorBroadcast = std::make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,

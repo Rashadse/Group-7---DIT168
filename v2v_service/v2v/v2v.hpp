@@ -2,7 +2,7 @@
 #define V2V_PROTOCOL_H
 
 #include <iomanip>
-#include <unistd.h>
+#include <cstdint>
 #include <sys/time.h>
 #include <map>
 #include <string>
@@ -43,6 +43,14 @@ static const int PEDAL_POSITION_READING = 1041;
 static const int GROUND_STEERING_READING = 1045;
 
 
+struct CarStatus {
+    uint8_t speed;
+    uint8_t steeringAngle;
+    uint8_t distanceTraveled;
+    uint8_t distanceFront;
+};
+
+
 class V2VService {
 public:
     V2VService(std::string ip, std::string groupId);
@@ -68,8 +76,13 @@ public:
 
     uint32_t lastFollowerUpdate;
     uint32_t lastLeaderUpdate;
+    
+    CarStatus *getCurrentCarStatus();
+    CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
 
 private:
+    CarStatus currentCarStatus;
+
     std::map<std::string, std::string> mapOfIps;
 
     std::string myIp;

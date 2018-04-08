@@ -90,13 +90,23 @@ int main() {
         switch (choice) {
             case 1: {
                 InternalFollowRequest msg;
-                msg.groupid("6");
+                std::string groupId = "";
+                
+                cout << "Which vehicle would you like to follow?" << endl;
+                cin >> groupId;
+                
+                msg.groupid(groupId);
                 internalBroadcast->send(msg);
                 break;
             }
             case 2: {
                 InternalStopFollow msg;
-                msg.groupid("6");   
+                std::string groupId = "";
+                
+                cout << "Which vehicle would you like to stop following?" << endl;
+                cin >> groupId;
+                
+                msg.groupid(groupId);
                 internalBroadcast->send(msg);
                 break;
             }

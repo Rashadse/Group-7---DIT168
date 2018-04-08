@@ -183,17 +183,27 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
                          std::cout << "received '" << followerStatus.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
+                         
+                        /*opendlv::proxy::GroundSteeringReading steeringMsg;
+                        opendlv::proxy::PedalPostitionReading speedMsg;
+                        steeringMsg.steeringAngle(followerStatus.steeringAngle());
+                        speedMsg.percent(followerStatus.speed());
+                        motorBroadcast->send(speedMsg);
+                        motorBroadcast->send(steeringMsg);*/
 
-                         /* TODO: implement lead logic (if applicable) */
+                        break;
+                    }
+                    case LEADER_STATUS: {
+                        LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
+                        std::cout << "received '" << leaderStatus.LongName()
+                                  << "' from '" << senderIp << "'!" << std::endl;
 
-                         break;
-                     }
-                     case LEADER_STATUS: {
-                         LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
-                         std::cout << "received '" << leaderStatus.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
-
-                         /* TODO: implement follow logic */
+                        opendlv::proxy::GroundSteeringReading steeringMsg;
+                        opendlv::proxy::PedalPositionReading speedMsg;
+                        steeringMsg.steeringAngle(leaderStatus.steeringAngle());
+                        speedMsg.percent(leaderStatus.speed());
+                        motorBroadcast->send(speedMsg);
+                        motorBroadcast->send(steeringMsg);
 
                          break;
                      }

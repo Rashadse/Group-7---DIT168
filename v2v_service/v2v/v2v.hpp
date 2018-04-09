@@ -35,6 +35,7 @@ static const int INTERNAL_STOP_FOLLOW_RESPONSE = 4003;
 static const int INTERNAL_GET_ALL_GROUPS_REQUEST = 4004;
 static const int INTERNAL_GET_ALL_GROUPS_RESPONSE = 4005;
 static const int INTERNAL_EMERGENCY_BRAKE = 4006;
+static const int INTERNAL_ANNOUNCE_PRESENCE = 4007;
 
 // Motor Proxy
 static const int MOTOR_BROADCAST_CHANNEL = 111;

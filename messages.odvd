@@ -63,6 +63,9 @@ message InternalStopFollowResponse [id = 4003] {
   string groupid [id = 1];
 }
 
+// Send message to announce our own presence in the network
+message InternalAnnouncePresence [id = 4007] {}
+
 // Send this message to V2V in order to get all announced cars
 message InternalGetAllGroupsRequest [id = 4004] {}
 

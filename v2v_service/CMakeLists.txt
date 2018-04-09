@@ -1,5 +1,3 @@
-# THIS IS JUST A TEMPLATE CMAKELISTS FILE! MAKE YOUR OWN IN YOUR OWN MICROSERVICE DIRECTORY!
-
 # CMAKE verion requirement
 cmake_minimum_required(VERSION 3.5)
 
@@ -11,13 +9,10 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra")
 
 # Path variables
-set(TEST_DIR tests)
-set(LIB_DIR libs)
 
 # Included packages
 find_package(libcluon REQUIRED)
 include_directories(SYSTEM ${CLUON_INCLUDE_DIRS})
-include_directories(${LIB_DIR})
 
 # Compile messages into c++
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
@@ -28,6 +23,11 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 
 # Executables -- ADD YOUR SERVICES COMPILATION COMMANDS BELOW
+add_executable(${PROJECT_NAME}-V2VService ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${CMAKE_CURRENT_SOURCE_DIR}/v2v/v2v.cpp)
+target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
+
+add_executable(${PROJECT_NAME}-RC_SIMULATOR ${CMAKE_CURRENT_SOURCE_DIR}/rc_sim.cpp ${CMAKE_BINARY_DIR}/messages.cpp)
+target_link_libraries(${PROJECT_NAME}-RC_SIMULATOR ${CLUON_LIBRARIES})
 
 # Testing
 #enable_testing()

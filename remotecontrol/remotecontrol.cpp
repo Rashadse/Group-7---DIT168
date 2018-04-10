@@ -13,11 +13,22 @@
 int main(int /*argc*/, char** /*argv*/) {
 
 
- motorChannel = std::make_shared<cluon::OD4Session>(
+std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Session>(
             180,
-            [](cluon::data::Envelope &&envelope) noexcept {});
+            [](cluon::data::Envelope &&envelope) noexcept {
+		 std::cout << "[OD4] ";
+                switch (envelope.dataType()) {
+                    case 4005: {
+                //        InternalGetAllGroupsResponse response = cluon::extractMessage<InternalGetAllGroupsResponse>(std::move(envelope));
+			//print response.groupid()
+//			response.groupid()
+//				internalChannel->send(response)
+                    }
+                    default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                }
+            });
 
- internalChannel = std::make_shared<cluon::OD4Session>(
+std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4Session>(
             181,
             [](cluon::data::Envelope &&envelope) noexcept {
                 std::cout << "[OD4] ";

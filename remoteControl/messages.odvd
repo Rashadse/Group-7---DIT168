@@ -1,0 +1,52 @@
+// Messages for interacting with the proxy
+message opendlv.proxy.GroundSteeringReading [id = 1045] {
+  float steeringAngle [id = 1];
+}
+
+message opendlv.proxy.PedalPositionReading [id = 1041] {
+  float percent [id = 1];
+}
+
+// V2V protocol messages
+message AnnouncePresence [id = 1001] {
+  string vehicleIp [id = 1];
+  uint16 activePort [id = 2];
+  string groupId [id = 3];
+}
+
+message FollowRequest [id = 1002] {
+}
+
+message FollowResponse [id = 1003] {
+  string ntpServerIp [id = 1];
+}
+
+message StopFollow [id = 1004] {
+}
+
+message LeaderStatus [id = 2001] {
+  uint32 timestamp [id = 1];
+  uint8 speed [id = 2];
+  uint8 steeringAngle [id = 3];
+  uint8 distanceTraveled [id = 4];
+}
+
+message FollowerStatus [id = 3001] {
+  uint32 timestamp [id = 1];
+  uint8 speed [id = 2];
+  uint8 steeringAngle [id = 3];
+  uint8 distanceFront [id = 4];
+  uint8 distanceTraveled [id = 5];
+}
+
+// Service To Service (STS) messages go below
+
+// Create message by specifying them like below.
+// Please note that every message HAS TO HAVE A UNIQUE ID!
+message ExampleMessage [id = 9999] {
+  // Fields inside the message do not need to be unique, meaning
+  // that this message (ExampleMessage) can have a field with id = 1
+  // while FollowerStatus ALSO can have a field with id = 1. It is only
+  // the id of the WHOLE MESSAGE that needs to be unique.
+  uint32 messageField [id = 1];
+}

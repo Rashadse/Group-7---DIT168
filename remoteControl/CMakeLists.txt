@@ -12,13 +12,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra")
 set(TEST_DIR tests)
 set(LIB_DIR libs)
 set(V2V_DIR v2v_service)
-set(REMOTE_DIR remoteControl)
+set(REMOTE_DIR RC)
 
 # Included packages
 find_package(libcluon REQUIRED)
 include_directories(SYSTEM ${CLUON_INCLUDE_DIRS})
 include_directories(${LIB_DIR})
-include_directories(${V2V_DIR})
+include_directories(${REMOTE_DIR})
 
 # Compile messages into c++
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
@@ -29,9 +29,9 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 
 # Executables -- ADD YOUR SERVICES COMPILATION COMMANDS BELOW
-add_executable(${PROJECT_NAME}-V2VService ${V2V_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${V2V_DIR}/v2v/v2v.cpp)
-target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
 
+add_executable(${PROJECT_NAME}-REMOTE_CONTROL ${REMOTE_DIR}/remoteControl.cpp ${CMAKE_BINARY_DIR}/messages.cpp)
+target_link_libraries(${PROJECT_NAME}-REMOTE_CONTROL ${CLUON_LIBRARIES})
 
 # Testing
 #enable_testing()

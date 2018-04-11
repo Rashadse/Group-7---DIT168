@@ -16,7 +16,6 @@ int main(int /*argc*/, char** /*argv*/) {
 std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Session>(
             180,
             [](cluon::data::Envelope &&envelope) noexcept {
-		 std::cout << "[OD4] ";
                 switch (envelope.dataType()) {
                     case 4005: {
                 //        InternalGetAllGroupsResponse response = cluon::extractMessage<InternalGetAllGroupsResponse>(std::move(envelope));
@@ -48,14 +47,7 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
 	//InternalGetAllGroupsRequest message1;
 	
 		
-
-    	std::cout << "To control the car use" << std::endl;
-	std::cout << "           W          " << std::endl;
-	std::cout << "    A             D   " << std::endl;
-	std::cout << "           S          " << std::endl;
-	std::cout << "Press X to emergency stop and quit" << std::endl;
-
-				
+		
 	// A variable used to increment/decrement the percentage of the speed pedal
 	float pedalPercentage;
 				
@@ -65,6 +57,15 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
                 while (loop) {
 
                 char direction;
+	
+	std::cout << "To control the car use" << std::endl;
+	std::cout << "           W          " << std::endl;
+	std::cout << "    A             D   " << std::endl;
+	std::cout << "           S          " << std::endl;
+	std::cout << "Press X to emergency stop and quit" << std::endl;
+
+
+		this_thread::sleep_for(chrono::milliseconds(2000));
 
                 std::cin >> direction;
 
@@ -72,8 +73,8 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
                 switch (direction) {
 
                     // accelerates
-
-                    case 'w': 
+		    
+                    case 'w': {
                         
                         std::cout << "Accelerate" << std::endl;
                         msgSteering.steeringAngle(0.0);
@@ -87,8 +88,8 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
                         motorChannel->send(msgPedal);
                          
                          break;
-                     
-                     case 's': 
+           		          }
+                     case 's': {
                          
                         std::cout << "Decelerate" << std::endl;
                         msgSteering.steeringAngle(0.0);
@@ -103,8 +104,8 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
                         motorChannel->send(msgPedal);
 
                          break;
-                     
-                     case 'a': 
+           		          }
+                     case 'a': { 
                         std::cout << "Turning left" << std::endl;
                         //the car should slow down before turning if the speed is over 20%.
                         if (pedalPercentage >= 0.2){
@@ -115,8 +116,8 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
                         motorChannel->send(msgSteering);
                          
                          break;
-                     
-                     case 'd': 
+            		         }
+                     case 'd': { 
                         std::cout << "Turning right" << std::endl;
                         //the car should slow down before turning if the speed is over 20%.
                         if (pedalPercentage >= 0.2){
@@ -127,8 +128,8 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
                         motorChannel->send(msgSteering);
 
                          break;
-                     
-                     case 'x': 
+            		         }
+                     case 'x': {
                         std::cout << "Emergency Stopping" << std::endl;
                         pedalPercentage = 0;
 			msgPedal.percent(pedalPercentage);
@@ -138,16 +139,19 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
 			std::cout << "quitting" << std::endl;
 			loop = false;
                          break;
-                     
+                		     }
                      default: 
+			{
 			std::cout << "wrong command, the car will now stop"<< std::endl;
 			pedalPercentage = 0;
 			msgPedal.percent(pedalPercentage);
 			motorChannel->send(msgPedal);
 			msgSteering.steeringAngle(0.0);
 			motorChannel->send(msgSteering);
-                 }
+			}                 
+		}
 	}
+return 0;
 }
 
 

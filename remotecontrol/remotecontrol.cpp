@@ -24,24 +24,24 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
 //			response.groupid()
 //				internalChannel->send(response)
                     }
-                    default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                    default: std::cout << "default case" << std::endl;
                 }
             });
 
-std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4Session>(
-            181,
-            [](cluon::data::Envelope &&envelope) noexcept {
-                std::cout << "[OD4] ";
-                switch (envelope.dataType()) {
-                    case 4005: {
+//std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4Session>(
+//            181,
+//            [](cluon::data::Envelope &&envelope) noexcept {
+//                std::cout << "[OD4] ";
+//                switch (envelope.dataType()) {
+//                    case 4005: {
                 //        InternalGetAllGroupsResponse response = cluon::extractMessage<InternalGetAllGroupsResponse>(std::move(envelope));
 			//print response.groupid()
 //			response.groupid()
 //				internalChannel->send(response)
                     }
-                    default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
-                }
-            });
+//                    default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
+//                }
+//            });
 
 	opendlv::proxy::GroundSteeringReading msgSteering;
    	opendlv::proxy::PedalPositionReading msgPedal;
@@ -66,8 +66,6 @@ std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4
 
                 while (loop) {
 
-			
-
                 char direction;
 
                 std::cin >> direction;
@@ -86,7 +84,7 @@ std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4
                 	if (pedalPercentage <= 0.4){
                             pedalPercentage += 0.1;
                         }
-			std::cout << "Accelerate" << pedalPercentage << "." << std::endl;
+			std::cout << "Accelerated by" << pedalPercentage << "." << std::endl;
                         msgPedal.percent(pedalPercentage);
                         motorChannel->send(msgPedal);
                          
@@ -101,7 +99,8 @@ std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4
                         if (pedalPercentage >= 0.11){
                             pedalPercentage -= 0.1;
                         }
-                        
+
+                        std::cout << "Accelerated by" << pedalPercentage << "." << std::endl;
                         msgPedal.percent(pedalPercentage);
                         motorChannel->send(msgPedal);
 
@@ -113,6 +112,7 @@ std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4
                         if (pedalPercentage >= 0.2){
                         pedalPercentage = 0.2;}
                         motorChannel->send(msgPedal);
+			std::cout << "turned left" << pedalPercentage << "." << std::endl;
                         msgSteering.steeringAngle(-15.0);
                         motorChannel->send(msgSteering);
                          
@@ -124,6 +124,7 @@ std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4
                         if (pedalPercentage >= 0.2){
                         pedalPercentage = 0.2;}
                         motorChannel->send(msgPedal);
+			std::cout << "turned right" << pedalPercentage << "." << std::endl;
                         msgSteering.steeringAngle(15.0);
                         motorChannel->send(msgSteering);
 
@@ -148,7 +149,7 @@ std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4
 			msgSteering.steeringAngle(0.0);
 			motorChannel->send(msgSteering);
                  }
-			}
-		}
+	}
+}
 
 

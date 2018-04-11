@@ -18,7 +18,7 @@ services:
         volumes:
         - /sys/:/sys/
         - /dev/:/dev/
-        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=111 --freq=50 --id=1"
+        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=180 --freq=50 --id=1"
 
     # Your microservice.
     example:

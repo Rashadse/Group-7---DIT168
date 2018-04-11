@@ -37,7 +37,7 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
 			//print response.groupid()
 //			response.groupid()
 //				internalChannel->send(response)
-                    }
+//                   }
 //                    default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
 //                }
 //            });

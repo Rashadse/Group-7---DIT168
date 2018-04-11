@@ -57,8 +57,6 @@ std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Ses
 
 				
 	// A variable used to increment/decrement the percentage of the speed pedal
-        //const int aLittleSpeed = 0.05;
-                
 	float pedalPercentage;
 				
 	// A variable used as a condition for the while loop to know when to quit the remote 		control UI

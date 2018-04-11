@@ -22,7 +22,7 @@ services:
 
     # Your microservice.
     example:
-        image: remotecontrl
+        image: remotecontrol
         depends_on:
         - proxy-miniature-pwm-motor
         network_mode: "host"

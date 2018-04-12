@@ -1,14 +1,8 @@
 #include <iostream>
 #include "remotecontrol.hpp"
-
-
-	opendlv::proxy::GroundSteeringReading msgSteering;
-   	opendlv::proxy::PedalPositionReading msgPedal;
-
+using namespace std;
 
 	
-		std::shared_ptr<cluon::OD4Session> motorChannel = std::make_shared<cluon::OD4Session>(MOTOR_CHANNEL,
-        	[](cluon::data::Envelope &&envelope) noexcept {	
 
 /*
 
@@ -23,14 +17,16 @@
                     default: { std::cout << "default case" << std::endl;
                 } }
 
-*/
+
 
         	});
 
 		std::shared_ptr<cluon::OD4Session> internalChannel = std::make_shared<cluon::OD4Session>(INTERNAL_CHANNEL,
         	[](cluon::data::Envelope &&envelope) noexcept {	
 
-/*                std::cout << "internal channel ";
+---------
+
+               std::cout << "internal channel ";
                 switch (envelope.dataType()) {
                     case 4005: {
                 	InternalGetAllGroupsResponse response = cluon::extractMessage<InternalGetAllGroupsResponse>(std::move(envelope));
@@ -41,83 +37,95 @@
                     default: {std::cout << "¯\\_(ツ)_/¯" << std::endl;
                 } } 
 
-*/ 	
 
 //InternalGetAllGroupsRequest message1;
 
         	});
-
+*/
 	
+    cluon::OD4Session motorChannel(MOTOR_CHANNEL,[](cluon::data::Envelope &&envelope) noexcept {
+        if (envelope.dataType() == opendlv::proxy::GroundSteeringReading::ID()) {
+            opendlv::proxy::GroundSteeringReading receivedMsg = cluon::extractMessage<opendlv::proxy::GroundSteeringReading>(std::move(envelope));
+            std::cout << "Sent a message for ground steering to " << receivedMsg.steeringAngle() << "." << std::endl;
+        }
+        else if (envelope.dataType() == opendlv::proxy::PedalPositionReading::ID()) {
+            opendlv::proxy::PedalPositionReading receivedMsg = cluon::extractMessage<opendlv::proxy::PedalPositionReading>(std::move(envelope));
+            std::cout << "Sent a message for pedal position to " << receivedMsg.percent() << "." << std::endl;
+        }
+    });
 
+
+	opendlv::proxy::GroundSteeringReading msgSteering;
+   	opendlv::proxy::PedalPositionReading msgPedal;
 
 int main() {
 		
 	std::shared_ptr<remoteControl> remoteSending = std::make_shared<remoteControl>();
-	this_thread::sleep_for(chrono::milliseconds(2000));
 	
-
-    while (true) {
-
-	this_thread::sleep_for(chrono::milliseconds(2000));
+	unsigned char direction;
 
 	std::cout << "          -----             " << std::endl;
-	std::cout << "                                  " << std::endl;
-
+	std::cout << "                            " << std::endl;
 	std::cout << "To control the car use" << std::endl;
-	std::cout << "           1          " << std::endl;
-	std::cout << "    3             4   " << std::endl;
-	std::cout << "           2          " << std::endl;
-	std::cout << "Press 0 to emergency stop and quit" << std::endl;
+	std::cout << "           w          " << std::endl;
+	std::cout << "    a             d   " << std::endl;
+	std::cout << "           s          " << std::endl;
+	std::cout << "Press x to emergency stop and quit" << std::endl;
 	std::cout << "                                  " << std::endl;
-	unsigned int direction;
+   
+   while (true) {
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+	
         std::cin >> direction;
 
                 switch (direction) {
 
                     // accelerates
 		    
-                    case 1: {
+                    case 'w': {
                         
 			remoteSending->Accelerate();
-                        motorChannel->send(msgSteering);
-                        motorChannel->send(msgPedal);
+                        motorChannel.send(msgSteering);
+                        motorChannel.send(msgPedal);
                          
                          break;
            		          }
 
                     // decelerates
-                     case 2: {
+                     case 's': {
                          
                         remoteSending->Decelerate();
-                        motorChannel->send(msgSteering);
-                        motorChannel->send(msgPedal);
+                        motorChannel.send(msgSteering);
+                        motorChannel.send(msgPedal);
 
                          break;
            		          }
                     // Turns left
-                     case 3: { 
+                     case 'a': { 
 
 			remoteSending->Left();
-                        motorChannel->send(msgSteering);
-                        motorChannel->send(msgPedal);
+                        motorChannel.send(msgSteering);
+                        motorChannel.send(msgPedal);
                          
                          break;
             		         }
                     // Turns Right
-                     case 4: { 
+                     case 'd': { 
 
 			remoteSending->Right();
-                        motorChannel->send(msgSteering);
-                        motorChannel->send(msgPedal);
+                        motorChannel.send(msgSteering);
+                        motorChannel.send(msgPedal);
 
                          break;
             		         }
                     // Stops
-                     case 0: {
+                     case 'x': {
 
 			remoteSending->Stop();
-                        motorChannel->send(msgSteering);
-                        motorChannel->send(msgPedal);
+                        motorChannel.send(msgSteering);
+                        motorChannel.send(msgPedal);
 			return -1;
 
 

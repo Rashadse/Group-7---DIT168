@@ -49,7 +49,7 @@ class remoteControl{
 
 public:
 
-	remoteControl();
+
 	
 	void Accelerate();
 	void Decelerate();

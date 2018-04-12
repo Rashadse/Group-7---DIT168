@@ -124,14 +124,14 @@ int main() {
             case 5: {
                 using namespace opendlv::proxy;
                 PedalPositionReading msg;
-                msg.percent(6.66);
+                msg.percent(0.0);
                 motorBroadcast->send(msg);
                 break;
             }
             case 6: {
                 using namespace opendlv::proxy;
                 GroundSteeringReading msg;
-                msg.steeringAngle(10.0);
+                msg.steeringAngle(0.0);
                 motorBroadcast->send(msg);
                 break;
             }

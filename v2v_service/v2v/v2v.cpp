@@ -199,15 +199,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
                          std::cout << "received '" << followerStatus.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
-                         
-                         // Prepared for followed updates, but not acting upon them, because why would we?...
-                        /*opendlv::proxy::GroundSteeringReading steeringMsg;
-                        opendlv::proxy::PedalPostitionReading speedMsg;
-                        steeringMsg.steeringAngle(followerStatus.steeringAngle());
-                        speedMsg.percent(followerStatus.speed());
-                        motorBroadcast->send(speedMsg);
-                        motorBroadcast->send(steeringMsg);*/
-
                         break;
                     }
                     case LEADER_STATUS: {
@@ -215,13 +206,14 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         std::cout << "received '" << leaderStatus.LongName()
                                   << "' from '" << senderIp << "'!" << std::endl;
                         std::cout << "New speed = " << unsigned(leaderStatus.speed()) << std::endl;
-
+                        
+                        /*
                         opendlv::proxy::GroundSteeringReading steeringMsg;
                         opendlv::proxy::PedalPositionReading speedMsg;
                         steeringMsg.steeringAngle(leaderStatus.steeringAngle());
                         speedMsg.percent(leaderStatus.speed());
                         motorBroadcast->send(speedMsg);
-                        motorBroadcast->send(steeringMsg);
+                        motorBroadcast->send(steeringMsg);*/
 
                          break;
                      }
@@ -235,7 +227,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
  * about the sending vehicle, including: IP, port and the group identifier.
  */
 void V2VService::announcePresence() {
-    if (!followerIp.empty()) return;
     AnnouncePresence announcePresence;
     announcePresence.vehicleIp(myIp);
     announcePresence.groupId(myGroupId);
@@ -299,13 +290,8 @@ void *sendFollowerStatuses(void *v2v) {
         CarStatus *currentCarStatus = v2vservice->getCurrentCarStatus();
         
         // Send sensor data
-        v2vservice->followerStatus(
-            currentCarStatus->speed,
-            currentCarStatus->steeringAngle,
-            currentCarStatus->distanceFront,
-            currentCarStatus->distanceTraveled
-        );
-        std::this_thread::sleep_for(125ms);
+        v2vservice->followerStatus();
+        std::this_thread::sleep_for(500ms);
     }
 
     pthread_exit(NULL);
@@ -333,15 +319,9 @@ void V2VService::startReportingToLeader() {
  * @param distanceFront - distance to nearest object in front of the car sending the status message
  * @param distanceTraveled - distance traveled since last reading
  */
-void V2VService::followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront,
-                                uint8_t distanceTraveled) {
+void V2VService::followerStatus() {
     if (leaderIp.empty()) return;
     FollowerStatus followerStatus;
-    followerStatus.timestamp(getTime());
-    followerStatus.speed(speed);
-    followerStatus.steeringAngle(steeringAngle);
-    followerStatus.distanceFront(distanceFront);
-    followerStatus.distanceTraveled(distanceTraveled);
     toLeader->send(encode(followerStatus));
 }
 
@@ -388,7 +368,7 @@ void V2VService::startReportingToFollower() {
  * @param steeringAngle - current steering angle
  * @param distanceTraveled - distance traveled since last reading
  */
-void V2VService::leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled) {
+void V2VService::leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled) {
     if (followerIp.empty()) return;
     LeaderStatus leaderStatus;
     leaderStatus.timestamp(getTime());
@@ -427,8 +407,8 @@ void V2VService::healthCheck() {
     std::cout << "GroupID: " << myGroupId << " IP-address: " << myIp << std::endl;
     std::cout << "-------------------------" << std::endl;
     std::cout << "Current Time: " << getTime() << std::endl;
-    std::cout << "Current speed:" << unsigned(status->speed) << std::endl;
-    std::cout << "Current angle:" << unsigned(status->steeringAngle) << std::endl;
+    std::cout << "Current speed:" << status->speed << std::endl;
+    std::cout << "Current angle:" << status->steeringAngle << std::endl;
     std::cout << "-------------------------" << std::endl;
     std::cout << "Follower:     " << followerIp << std::endl;
     std::cout << "Leader:       " << leaderIp << std::endl;

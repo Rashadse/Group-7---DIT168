@@ -15,7 +15,7 @@
 #include "messages.hpp"
 
 // V2V external
-static const int BROADCAST_CHANNEL = 200;
+static const int BROADCAST_CHANNEL = 250;
 static const int DEFAULT_PORT = 50001;
 
 static const int ANNOUNCE_PRESENCE = 1001;
@@ -26,7 +26,7 @@ static const int LEADER_STATUS = 2001;
 static const int FOLLOWER_STATUS = 3001;
 
 // STS internal
-static const int INTERNAL_BROADCAST_CHANNEL = 201;
+static const int INTERNAL_BROADCAST_CHANNEL = 181;
 
 static const int INTERNAL_FOLLOW_REQUEST = 4000;
 static const int INTERNAL_FOLLOW_RESPONSE = 4001;
@@ -38,15 +38,15 @@ static const int INTERNAL_EMERGENCY_BRAKE = 4006;
 static const int INTERNAL_ANNOUNCE_PRESENCE = 4007;
 
 // Motor Proxy
-static const int MOTOR_BROADCAST_CHANNEL = 111;
+static const int MOTOR_BROADCAST_CHANNEL = 180;
 
 static const int PEDAL_POSITION_READING = 1041;
 static const int GROUND_STEERING_READING = 1045;
 
 
 struct CarStatus {
-    uint8_t speed;
-    uint8_t steeringAngle;
+    float speed;
+    float steeringAngle;
     uint8_t distanceTraveled;
     uint8_t distanceFront;
 };

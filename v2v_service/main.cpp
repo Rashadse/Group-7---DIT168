@@ -8,6 +8,7 @@
 
 using namespace std;
 int main(int /*argc*/, char** /*argv*/) {
+    /*
     string ip;
     ifstream ip_file ("ip.txt");
     if (ip_file.is_open()) {
@@ -18,8 +19,8 @@ int main(int /*argc*/, char** /*argv*/) {
         cout << "Failed to read IP address" << endl;
         exit(1);
     }
-    
-    shared_ptr<V2VService> v2vService = make_shared<V2VService>(ip, "7");
+    */
+    shared_ptr<V2VService> v2vService = make_shared<V2VService>("192.168.0.15", "7");
 
     while (true) {
         unsigned int choice;
@@ -60,8 +61,8 @@ int main(int /*argc*/, char** /*argv*/) {
                 break;
             case 3: v2vService->followResponse(); break;
             case 4: v2vService->stopFollow(); break;
-            case 5: v2vService->leaderStatus(50, 0, 100); break;
-            case 6: v2vService->followerStatus(50, 0, 10, 100); break;
+            case 5: v2vService->leaderStatus(0, 0, 0); break;
+            case 6: v2vService->followerStatus(); break;
             case 7:
                 ipMap = v2vService->getMapOfIps();
                 for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {

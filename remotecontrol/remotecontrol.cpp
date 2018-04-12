@@ -53,28 +53,30 @@
 int main() {
 		
 	std::shared_ptr<remoteControl> remoteSending = std::make_shared<remoteControl>();
-
-	unsigned char direction;
+	this_thread::sleep_for(chrono::milliseconds(2000));
+	
 
     while (true) {
+
+	this_thread::sleep_for(chrono::milliseconds(2000));
 
 	std::cout << "          -----             " << std::endl;
 	std::cout << "                                  " << std::endl;
 
 	std::cout << "To control the car use" << std::endl;
-	std::cout << "           W          " << std::endl;
-	std::cout << "    A             D   " << std::endl;
-	std::cout << "           S          " << std::endl;
-	std::cout << "Press X to emergency stop and quit" << std::endl;
+	std::cout << "           1          " << std::endl;
+	std::cout << "    3             4   " << std::endl;
+	std::cout << "           2          " << std::endl;
+	std::cout << "Press 0 to emergency stop and quit" << std::endl;
 	std::cout << "                                  " << std::endl;
-
+	unsigned int direction;
         std::cin >> direction;
 
                 switch (direction) {
 
                     // accelerates
 		    
-                    case 'w': {
+                    case 1: {
                         
 			remoteSending->Accelerate();
                         motorChannel->send(msgSteering);
@@ -84,7 +86,7 @@ int main() {
            		          }
 
                     // decelerates
-                     case 's': {
+                     case 2: {
                          
                         remoteSending->Decelerate();
                         motorChannel->send(msgSteering);
@@ -93,7 +95,7 @@ int main() {
                          break;
            		          }
                     // Turns left
-                     case 'a': { 
+                     case 3: { 
 
 			remoteSending->Left();
                         motorChannel->send(msgSteering);
@@ -102,7 +104,7 @@ int main() {
                          break;
             		         }
                     // Turns Right
-                     case 'd': { 
+                     case 4: { 
 
 			remoteSending->Right();
                         motorChannel->send(msgSteering);
@@ -111,14 +113,14 @@ int main() {
                          break;
             		         }
                     // Stops
-                     case 'x': {
+                     case 0: {
 
 			remoteSending->Stop();
                         motorChannel->send(msgSteering);
                         motorChannel->send(msgPedal);
 			return -1;
 
-                         break;
+
                 		     }
                      default: 
 			{
@@ -128,6 +130,7 @@ int main() {
 			}                 
 		}
 	}
+	return 0;
 }
 
 

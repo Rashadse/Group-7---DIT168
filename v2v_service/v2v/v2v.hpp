@@ -62,10 +62,10 @@ public:
     void stopFollow();
 
     void startReportingToFollower();
-    void leaderStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceTraveled);
+    void leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled);
 
     void startReportingToLeader();
-    void followerStatus(uint8_t speed, uint8_t steeringAngle, uint8_t distanceFront, uint8_t distanceTraveled);
+    void followerStatus();
 
     std::map<std::string, std::string> getMapOfIps();
     void healthCheck();

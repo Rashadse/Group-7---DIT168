@@ -285,10 +285,7 @@ void *sendFollowerStatuses(void *v2v) {
     std::cout << "Update leader thread started!" << std::endl;
 
     using namespace std::chrono_literals;
-    while (!v2vservice->leaderIp.empty()) {
-        // Get sensor data
-        CarStatus *currentCarStatus = v2vservice->getCurrentCarStatus();
-        
+    while (!v2vservice->leaderIp.empty()) {        
         // Send sensor data
         v2vservice->followerStatus();
         std::this_thread::sleep_for(500ms);

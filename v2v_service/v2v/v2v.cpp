@@ -113,20 +113,21 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     motorBroadcast = std::make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            //std::cout << "[MOTOR] ";
+            std::cout << "[MOTOR] ";
+            std::cout << envelope.dataType() << " ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
-                    //std::cout << "Got new pedal position: " << msg.percent() << std::endl;
-                    currentCarStatus.speed = (uint8_t) msg.percent();
+                    std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+                    currentCarStatus.speed = msg.percent();
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
-                    //std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
-                    currentCarStatus.steeringAngle = (uint8_t) msg.steeringAngle();
+                    std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+                    currentCarStatus.steeringAngle = msg.steeringAngle();
                     break;
                 }
                 default:
@@ -205,7 +206,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
                         std::cout << "received '" << leaderStatus.LongName()
                                   << "' from '" << senderIp << "'!" << std::endl;
-                        std::cout << "New speed = " << unsigned(leaderStatus.speed()) << std::endl;
+                        std::cout << "New speed = " << leaderStatus.speed() << std::endl;
                         
                         /*
                         opendlv::proxy::GroundSteeringReading steeringMsg;

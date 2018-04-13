@@ -113,20 +113,20 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     motorBroadcast = std::make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            std::cout << "[MOTOR] ";
-            std::cout << envelope.dataType() << " ";
+            //std::cout << "[MOTOR] ";
+            //std::cout << envelope.dataType() << " ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
-                    std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+                    //std::cout << "Got new pedal position: " << msg.percent() << std::endl;
                     currentCarStatus.speed = msg.percent();
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
-                    std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+                    //std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
                     currentCarStatus.steeringAngle = msg.steeringAngle();
                     break;
                 }
@@ -207,6 +207,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         std::cout << "received '" << leaderStatus.LongName()
                                   << "' from '" << senderIp << "'!" << std::endl;
                         std::cout << "New speed = " << leaderStatus.speed() << std::endl;
+                        std::cout << "New steering = " << leaderStatus.steeringAngle() << std::endl;
                         
                         /*
                         opendlv::proxy::GroundSteeringReading steeringMsg;
@@ -339,7 +340,7 @@ void *sendLeaderStatuses(void *v2v) {
             currentCarStatus->distanceTraveled
         );
         // Message frequency according to protocol.
-        std::this_thread::sleep_for(125ms);
+        std::this_thread::sleep_for(500ms);
     }
     
     pthread_exit(NULL);

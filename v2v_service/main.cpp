@@ -8,19 +8,6 @@
 
 using namespace std;
 int main(int /*argc*/, char** /*argv*/) {
-    /*
-    string ip;
-    ifstream ip_file ("ip.txt");
-    if (ip_file.is_open()) {
-        getline(ip_file, ip);
-        ip_file.close();
-        cout << ip << " = CURRENT IP ADDRESS" << endl;
-    } else {
-        cout << "Failed to read IP address" << endl;
-        exit(1);
-    }
-    */
-
     shared_ptr<V2VService> v2vService = make_shared<V2VService>("192.168.43.212", "7");
 
     while (true) {

@@ -465,12 +465,12 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     motorBroadcast->send(speedMsg);
 }
 
-void stopCar() {
+void V2VService::stopCar() {
     opendlv::proxy::GroundSteeringReading steeringMsg;
     opendlv::proxy::PedalPositionReading speedMsg;
     
     steeringMsg.steeringAngle(0.0);
-    speedMsg.speed(0.0);
+    speedMsg.percent(0.0);
     motorBroadcast->send(steeringMsg);
     motorBroadcast->send(speedMsg);
 }

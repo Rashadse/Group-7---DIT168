@@ -43,6 +43,9 @@ static const int MOTOR_BROADCAST_CHANNEL = 180;
 static const int PEDAL_POSITION_READING = 1041;
 static const int GROUND_STEERING_READING = 1045;
 
+// Ultrasonic reading
+static const int DISTANCE_READING = 1039;
+
 
 struct CarStatus {
     float speed;

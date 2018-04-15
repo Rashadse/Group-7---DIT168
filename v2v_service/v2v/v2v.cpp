@@ -402,21 +402,21 @@ void V2VService::healthCheck() {
     std::map<std::string, std::string> ipMap = getMapOfIps();
     CarStatus *status = getCurrentCarStatus();
     std::cout << "V2VService health check" << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "GroupID: " << myGroupId << " IP-address: " << myIp << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "Current Time: " << getTime() << std::endl;
-    std::cout << "Current speed:" << status->speed << std::endl;
-    std::cout << "Current angle:" << status->steeringAngle << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "Follower:     " << followerIp << std::endl;
-    std::cout << "Leader:       " << leaderIp << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "Announced:    " << followerIp << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << "GroupID : " << myGroupId << " IP-address : " << myIp << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << "Current Time (s)  : " << getTime() << std::endl;
+    std::cout << "Current speed (%) : " << status->speed << std::endl;
+    std::cout << "Current angle (%) : " << status->steeringAngle << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << "Follower          : " << followerIp << std::endl;
+    std::cout << "Leader            : " << leaderIp << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << "Announced         : " << followerIp << std::endl;
     for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
-        std::cout << "    Group: " << it->first << " IP: " << it->second << std::endl;
+        std::cout << "    Group " << it->first << " - IP " << it->second << std::endl;
     }
-    std::cout << "-------------------------" << std::endl;
+    std::cout << "--------------------------------------" << std::endl;
 }
 
 /**
@@ -425,9 +425,10 @@ void V2VService::healthCheck() {
  * @return current time in milliseconds
  */
 uint32_t V2VService::getTime() {
-    timeval now;
-    gettimeofday(&now, nullptr);
-    return (uint32_t ) now.tv_usec / 1000;
+    const auto now = std::chrono::system_clock::now();
+    const auto epoch = now.time_since_epoch();
+    const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(epoch);
+    return (uint32_t) seconds.count();
 }
 
 /**

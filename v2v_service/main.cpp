@@ -7,8 +7,12 @@
 
 
 using namespace std;
-int main(int /*argc*/, char** /*argv*/) {
-    shared_ptr<V2VService> v2vService = make_shared<V2VService>("192.168.43.212", "7");
+int main(int argc, char** argv) {
+    if (argc < 3) {
+        cout << "You need to provide <ip-address> and <group ID>" << endl;
+        exit(1);
+    }
+    shared_ptr<V2VService> v2vService = make_shared<V2VService>(argv[1], argv[2]);
 
     while (true) {
         unsigned int choice;

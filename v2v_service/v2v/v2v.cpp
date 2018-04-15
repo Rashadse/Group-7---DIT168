@@ -232,8 +232,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 case LEADER_STATUS: {
                     LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
                     std::cout << "received '" << leaderStatus.LongName() <<
-                                 "New speed = " << leaderStatus.speed() <<
-                                 "New steering = " << leaderStatus.steeringAngle() << std::endl;
+                                 " - New speed = " << leaderStatus.speed() <<
+                                 " - New steering = " << leaderStatus.steeringAngle() << std::endl;
 
                     // Only process the message if we have a leader.
                     if (!leaderIp.empty()) {
@@ -433,8 +433,8 @@ void V2VService::startReportingToFollower() {
 void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
-    uint8_t distanceTraveled = leaderStatusUpdate.distanceTraveled();
-    uint32_t timestamp = leaderStatusUpdate.timestamp();
+    //uint8_t distanceTraveled = leaderStatusUpdate.distanceTraveled();
+    //uint32_t timestamp = leaderStatusUpdate.timestamp();
 
     /*
      * 1. Process gotten data

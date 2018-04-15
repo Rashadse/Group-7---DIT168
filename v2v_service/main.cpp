@@ -46,12 +46,12 @@ int main(int argc, char** argv) {
                 break;
             }
             case 2: {
+                map<string, string> ipMap = v2vService->getMapOfIps();
                 if (ipMap.size() < 1) {
                     cout << "There are no IPs to choose from, wait for someone to announce themselves!" << endl;
                     break;
                 }
 
-                map<string, string> ipMap = v2vService->getMapOfIps();
                 std::string groupId = "";
 
                 cout << "Which vehicle would you like to follow?" << endl;

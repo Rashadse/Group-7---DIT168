@@ -62,8 +62,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
             switch (envelope.dataType()) {
                 case INTERNAL_ANNOUNCE_PRESENCE: {
-                    std::cout << "Announcing presence!" << std::endl;
-
                     announcePresence();
 
                     break;
@@ -71,17 +69,21 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 case INTERNAL_FOLLOW_REQUEST: {
                     InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
 
-                    // We will not send a response if we are already following someone.
+                    // In case we already have a leader, we return an internal follow response with
+                    // a negative result code right away.
                     if (leaderIp.empty()){
                         followRequest(mapOfIps[msg.groupid()]);
+                    } else {
+                        InternalFollowResponse msg;
+                        msg.groupid(mapOfIds[senderIp]);
+                        msg.status(0);
+                        internalBroadCast->send(msg);
                     }
-                    std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
 
                     break;
                 }
                 case INTERNAL_STOP_FOLLOW_REQUEST: {
                     InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
-                    std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
 
                     stopFollow();
 
@@ -125,19 +127,16 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     motorBroadcast = std::make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            //std::cout << "[MOTOR] ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
-                    //std::cout << "Got new pedal position: " << msg.percent() << std::endl;
                     currentCarStatus.speed = msg.percent();
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
-                    //std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
                     currentCarStatus.steeringAngle = msg.steeringAngle();
                     break;
                 }
@@ -150,7 +149,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     break;
                 }
                 default: {
-                    std::cout << "Received unknown message with dataType = " << envelope.dataType() << std::endl;
                     break;
                 }
             } // end switch

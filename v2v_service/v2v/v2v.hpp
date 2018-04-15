@@ -60,6 +60,7 @@ public:
     void followRequest(std::string vehicleIp);
     void followResponse();
     void stopFollow();
+    void stopCar();
 
     void startReportingToFollower();
     void leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled);

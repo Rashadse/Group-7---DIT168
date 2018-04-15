@@ -214,7 +214,11 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         leaderIp = "";
                         toLeader.reset();
                         lastLeaderUpdate = 0;
+                        
+                        // If it was the leader who sent the stop follow, we should also reset our car and stop it.
+                        stopCar();
                     }
+                    
                     break;
                 }
                 case FOLLOWER_STATUS: {
@@ -298,6 +302,9 @@ void V2VService::stopFollow() {
     	toLeader->send(encode(stopFollow));
     	leaderIp = "";
      	toLeader.reset();
+     	
+     	// If we want to stop following the leader, we need to stop our car.
+     	stopCar();
     }
     if (followerIp != "") {
 	    toFollower->send(encode(stopFollow));
@@ -454,6 +461,16 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     /*
      * 3. Actuate against motor channel
      */
+    motorBroadcast->send(steeringMsg);
+    motorBroadcast->send(speedMsg);
+}
+
+void stopCar() {
+    opendlv::proxy::GroundSteeringReading steeringMsg;
+    opendlv::proxy::PedalPositionReading speedMsg;
+    
+    steeringMsg.steeringAngle(0.0);
+    speedMsg.speed(0.0);
     motorBroadcast->send(steeringMsg);
     motorBroadcast->send(speedMsg);
 }

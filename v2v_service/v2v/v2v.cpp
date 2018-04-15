@@ -108,11 +108,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     // Terminate communication with any other vehicle.
                     stopFollow();
 
-                    /*
-                     * Since the message came from outside, another microservice should be aware of the brake situation
-                     * and stop the car from moving.
-                     */
-
                     std::cout << "received '" << msg.LongName() << std::endl;
                     break;
                 }
@@ -147,8 +142,10 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     break;
                 }
                 case DISTANCE_READING: {
-                    DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
-                    std::cout << msg.distance() << std::endl;
+                    /* Ignoring distance until an understandable reading can be gotten. */
+                    
+                    //DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
+                    //std::cout << msg.distance() << std::endl;
                     
                     break;
                 }

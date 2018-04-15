@@ -147,6 +147,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     break;
                 }
                 default: {
+                    std::cout << "Received unknown message with dataType = " << envelope.dataType() << std::endl;
                     break;
                 }
             } // end switch

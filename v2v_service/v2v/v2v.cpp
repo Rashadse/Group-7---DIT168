@@ -29,19 +29,19 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     broadcast = std::make_shared<cluon::OD4Session>(
         BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            std::cout << "[OD4] ";
+
             switch (envelope.dataType()) {
                 case ANNOUNCE_PRESENCE: {
                     AnnouncePresence ap = cluon::extractMessage<AnnouncePresence>(std::move(envelope));
-                    std::cout << "received 'AnnouncePresence' from '"
+                    std::cout << "[BROADCAST] received 'AnnouncePresence' from '"
                               << ap.vehicleIp() << "', GroupID '"
                               << ap.groupId() << "'!" << std::endl;
 
                     // Filter out yourself from announcement
                     if (ap.groupId() != myGroupId) {
                         mapOfIps.insert(std::make_pair(ap.groupId(), ap.vehicleIp()));
-                        mapOfIds[ap.vehicleIp()] = ap.groupId();
-                    }
+                        mapOfIds[ap.vehicleIp()] = ap.groupId(); // Map for being able to get a groupid
+                    }                                            // from an IP as well.
 
                     break;
                 }
@@ -58,7 +58,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     internalBroadCast = std::make_shared<cluon::OD4Session>(
         INTERNAL_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            std::cout <<"[INTERNAL BR] ";
 
             switch (envelope.dataType()) {
                 case INTERNAL_ANNOUNCE_PRESENCE: {
@@ -163,7 +162,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
         "0.0.0.0",
         DEFAULT_PORT,
         [this](std::string &&data, std::string &&sender, std::chrono::system_clock::time_point /*&&ts*/) noexcept {
-            std::cout << "[UDP] ";
             std::pair<int16_t, std::string> msg = extract(data);
 
             std::string senderIp = sender.substr(0, sender.find(":"));
@@ -171,7 +169,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
             switch (msg.first) {
                 case FOLLOW_REQUEST: {
                     FollowRequest followRequest = decode<FollowRequest>(msg.second);
-                    std::cout << "received '" << followRequest.LongName()
+                    std::cout << "[INCOMING] received '" << followRequest.LongName()
                                << "' from '" << senderIp << "'!" << std::endl;
 
                     // After receiving a FollowRequest, check first if there is currently no car already following.
@@ -187,7 +185,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
                 case FOLLOW_RESPONSE: {
                     FollowResponse followResponse = decode<FollowResponse>(msg.second);
-                    std::cout << "received '" << followResponse.LongName()
+                    std::cout << "[INCOMING] received '" << followResponse.LongName()
                               << "' from '" << senderIp << "'!" << std::endl;
 
                     // Makes sure we do not accept any rogue responses.
@@ -203,7 +201,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
                 case STOP_FOLLOW: {
                     StopFollow stopFollow = decode<StopFollow>(msg.second);
-                    std::cout << "received '" << stopFollow.LongName()
+                    std::cout << "[INCOMING] received '" << stopFollow.LongName()
                               << "' from '" << senderIp << "'!" << std::endl;
 
                     // Clear either follower or leader slot, depending on current role.
@@ -225,7 +223,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
                 case FOLLOWER_STATUS: {
                     FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
-                    std::cout << "received '" << followerStatus.LongName()
+                    std::cout << "[INCOMING] received '" << followerStatus.LongName()
                               << "' from '" << senderIp << "'!" << std::endl;
 
                     // If we have a follower, update the last received time for follower status.
@@ -237,7 +235,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
                 case LEADER_STATUS: {
                     LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
-                    std::cout << "received '" << leaderStatus.LongName() <<
+                    std::cout << "[INCOMING] received '" << leaderStatus.LongName() <<
                                  " - New speed = " << leaderStatus.speed() <<
                                  " - New steering = " << leaderStatus.steeringAngle() << std::endl;
 

@@ -12,31 +12,30 @@ int main() {
     shared_ptr<cluon::OD4Session> internalBroadcast = make_shared<cluon::OD4Session>(
         INTERNAL_BROADCAST_CHANNEL,
         [](cluon::data::Envelope &&envelope) noexcept {
-            cout << "[RC INTERNAL] ";
             
             switch (envelope.dataType()) {
                 case INTERNAL_FOLLOW_RESPONSE: {
                     InternalFollowResponse msg = cluon::extractMessage<InternalFollowResponse>(std::move(envelope));
                     
-                    cout << "Now following group: " << msg.groupid() << " status: " << msg.status() << endl;
+                    cout << "[RC INTERNAL] Now following group: " << msg.groupid() << " status: " << msg.status() << endl;
                     break;
                 }
                 case INTERNAL_STOP_FOLLOW_RESPONSE: {
                     InternalStopFollowResponse msg = cluon::extractMessage<InternalStopFollowResponse>(std::move(envelope));
                     
-                    cout << "Stopped following group: " << msg.groupid() << endl;
+                    cout << "[RC INTERNAL] Stopped following group: " << msg.groupid() << endl;
                     break;
                 }
                 case INTERNAL_GET_ALL_GROUPS_RESPONSE: {
                     InternalGetAllGroupsResponse msg = cluon::extractMessage<InternalGetAllGroupsResponse>(std::move(envelope));
                     
-                    cout << "Got group: " << msg.groupid() << endl;
+                    cout << "[RC INTERNAL] Got group: " << msg.groupid() << endl;
                     break;
                 }
                 case INTERNAL_EMERGENCY_BRAKE: {
                     InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
                     
-                    cout << "Emergency brake!" << endl;
+                    cout << "[RC INTERNAL] Emergency brake!" << endl;
                     break;
                 }
                 default: {
@@ -49,20 +48,19 @@ int main() {
     shared_ptr<cluon::OD4Session> motorBroadcast = make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
         [](cluon::data::Envelope &&envelope) noexcept {
-            std::cout << "[RC MOTOR] ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
                     
-                    std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+                    std::cout << "[RC MOTOR] Got new pedal position: " << msg.percent() << std::endl;
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
                     
-                    std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+                    std::cout << "[RC MOTOR] Got new steering reading: " << msg.steeringAngle() << std::endl;
                     break;
                 }
                 default: {

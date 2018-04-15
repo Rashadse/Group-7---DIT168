@@ -465,6 +465,9 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     motorBroadcast->send(speedMsg);
 }
 
+/**
+ * Sends actuating messages to motor channel to stop the car.
+ */
 void V2VService::stopCar() {
     opendlv::proxy::GroundSteeringReading steeringMsg;
     opendlv::proxy::PedalPositionReading speedMsg;

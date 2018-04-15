@@ -6,7 +6,7 @@ services:
         restart: always
         volumes:
         - .:/opt/miniature.data
-        command: "/opt/od4/bin/odsupercomponent --cid=111 --verbose=1 --configuration=/opt/miniature.data/configuration"
+        command: "/opt/od4/bin/odsupercomponent --cid=180 --verbose=1 --configuration=/opt/miniature.data/configuration"
 
     proxy-miniature-pwm-motor:
         image: seresearch/2018-dit-168:v0.3.5-armhf
@@ -18,13 +18,13 @@ services:
         volumes:
         - /sys/:/sys/
         - /dev/:/dev/
-        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=111 --freq=50 --id=1"
+        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=180 --freq=50 --id=1"
 
-    # Your microservice.
-    example:
-        image: group7/carcode
-        depends_on:
-        - proxy-miniature-pwm-motor
+    device-ultrasonic-srf08-front:
+        image: chalmersrevere/opendlv-device-ultrasonic-srf08-armhf:v0.0.6
         network_mode: "host"
-        restart: always # maybe running only once is enough?
-        command: "/opt/CarServices-V2VService"
+        privileged: true
+        volumes:
+          - /dev/i2c-1:/dev/i2c-1
+        command: "/usr/bin/opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=180 --freq=5 --id=0"
+    

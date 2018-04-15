@@ -8,7 +8,7 @@ message opendlv.proxy.PedalPositionReading [id = 1041] {
 }
 
 // Message for getting distance value from front ultrasonic
-message opendlv.proxy.DistanceReading {
+message opendlv.proxy.DistanceReading [id = 1039] {
   float distance [id = 1];
 }
 

@@ -148,7 +148,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
                 case DISTANCE_READING: {
                     DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
-                    std::cout << msg.distance << std::endl;
+                    std::cout << msg.distance() << std::endl;
                     
                     break;
                 }

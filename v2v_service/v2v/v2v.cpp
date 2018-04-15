@@ -38,8 +38,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         
                         break;
                     }
-                    default: 
-                        std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                    default:
                         break;
                 }
             });
@@ -103,8 +102,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     std::cout << "received '" << msg.LongName() << std::endl;
                     break;
                 }
-                default: 
-                    std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                default:
                     break;
             }
          }
@@ -114,7 +112,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
         MOTOR_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
             //std::cout << "[MOTOR] ";
-            //std::cout << envelope.dataType() << " ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
@@ -131,7 +128,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     break;
                 }
                 default:
-                    std::cout << "Could not understand message" << std::endl;
                     break;
             }
         }
@@ -172,12 +168,15 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          std::cout << "received '" << followResponse.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
 
-                        startReportingToLeader();
-                        InternalFollowResponse msg;
-                        msg.groupid(mapOfIds[senderIp]);
-                        msg.status(1);
-                        internalBroadCast->send(msg);
+                        // Makes sure we do not accept any rogue responses.
+                        if (senderIp == leaderIp) {
+                            startReportingToLeader();
                         
+                            InternalFollowResponse msg;
+                            msg.groupid(mapOfIds[senderIp]);
+                            msg.status(1);
+                            internalBroadCast->send(msg);
+                        }
                          break;
                      }
                      case STOP_FOLLOW: {
@@ -189,37 +188,51 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                          if (senderIp == followerIp) {
                              followerIp = "";
                              toFollower.reset();
+                             lastFollowerUpdate = 0;
                          }
                          else if (senderIp == leaderIp) {
                              leaderIp = "";
                              toLeader.reset();
+                             lastLeaderUpdate = 0;
                          }
                          break;
                      }
                      case FOLLOWER_STATUS: {
-                         FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
-                         std::cout << "received '" << followerStatus.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
+                        FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
+                        std::cout << "received '" << followerStatus.LongName()
+                                  << "' from '" << senderIp << "'!" << std::endl;
+                        
+                        // If we have a follower, update the last received time for follower status.
+                        if (!followerIp.empty()) {
+                            lastFollowerUpdate = getTime();
+                        }
+                                   
                         break;
                     }
                     case LEADER_STATUS: {
                         LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
-                        std::cout << "received '" << leaderStatus.LongName()
-                                  << "' from '" << senderIp << "'!" << std::endl;
-                        std::cout << "New speed = " << leaderStatus.speed() << std::endl;
-                        std::cout << "New steering = " << leaderStatus.steeringAngle() << std::endl;
+                        std::cout << "received '" << leaderStatus.LongName() <<
+                                     "New speed = " << leaderStatus.speed() <<
+                                     "New steering = " << leaderStatus.steeringAngle() << std::endl;
                         
-                        /*
-                        opendlv::proxy::GroundSteeringReading steeringMsg;
-                        opendlv::proxy::PedalPositionReading speedMsg;
-                        steeringMsg.steeringAngle(leaderStatus.steeringAngle());
-                        speedMsg.percent(leaderStatus.speed());
-                        motorBroadcast->send(speedMsg);
-                        motorBroadcast->send(steeringMsg);*/
+                        // Only process the message if we have a leader.
+                        if (!leaderIp.empty()) {
+                            lastLeaderUpdate = getTime();
+                        
+                            // Process gotten data
+                            opendlv::proxy::GroundSteeringReading steeringMsg;
+                            steeringMsg.steeringAngle(leaderStatus.steeringAngle());
 
-                         break;
+                            opendlv::proxy::PedalPositionReading speedMsg;
+                            speedMsg.percent(leaderStatus.speed());
+
+                            motorBroadcast->send(steeringMsg);
+                            motorBroadcast->send(speedMsg);
+                        }
+                        break;
                      }
-                     default: std::cout << "¯\\_(ツ)_/¯" << std::endl;
+                     default:
+                        break;
                  }
              });
 }
@@ -266,29 +279,39 @@ void V2VService::followResponse() {
  * @param vehicleIp - IP of the target for the request
  */
 void V2VService::stopFollow() {
+    // Clear comm channels
     StopFollow stopFollow;
     if (leaderIp != "") {
-        // Clear comm channels
     	toLeader->send(encode(stopFollow));
     	leaderIp = "";
      	toLeader.reset();
     }
     if (followerIp != "") {
-        // Clear comm channels
 	    toFollower->send(encode(stopFollow));
      	followerIp = "";
      	toFollower.reset();
     }
+    
+    // Clear timestamps
+    lastFollowerUpdate = 0;
+    lastLeaderUpdate = 0;
 }
 
 void *sendFollowerStatuses(void *v2v) {
     V2VService *v2vservice;
     v2vservice = (V2VService *)v2v;
-    std::cout << "Update leader thread started!" << std::endl;
+    std::cout << "Send follower status thread started!" << std::endl;
 
     using namespace std::chrono_literals;
     while (!v2vservice->leaderIp.empty()) {        
-        // Send sensor data
+
+        // Since leader updates are more frequent than follower statuses,
+        // we disconnect after only one second of radio silence.
+        if ((v2vservice->getTime() - v2vservice->lastLeaderUpdate) > 1) {
+            v2vservice->stopFollow();
+            break;
+        }
+
         v2vservice->followerStatus();
         std::this_thread::sleep_for(500ms);
     }
@@ -330,9 +353,17 @@ void *sendLeaderStatuses(void *v2v) {
     std::cout << "Update follower thread started!" << std::endl;
     
     using namespace std::chrono_literals;
-    while (!v2vservice->followerIp.empty()) {
+    while (!v2vservice->followerIp.empty()) {   // Report as long as we have a follower
+    
+        // If no update has been received from follower for more than two seconds, disconnect
+        if ((v2vservice->getTime() - v2vservice->lastFollowerUpdate) > 2) {
+            v2vservice->stopFollow();
+            break;
+        }
+        
         // Get sensor data
         CarStatus *currentCarStatus = v2vservice->getCurrentCarStatus();
+        
         // Send sensor data
         v2vservice->leaderStatus(
             currentCarStatus->speed,
@@ -340,7 +371,7 @@ void *sendLeaderStatuses(void *v2v) {
             currentCarStatus->distanceTraveled
         );
         // Message frequency according to protocol.
-        std::this_thread::sleep_for(500ms);
+        std::this_thread::sleep_for(125ms);
     }
     
     pthread_exit(NULL);
@@ -363,9 +394,9 @@ void V2VService::startReportingToFollower() {
 /**
  * This function sends a LeaderStatus (id = 2001) message on the follower channel.
  *
- * @param speed - current velocity
+ * @param speed - current pedal position
  * @param steeringAngle - current steering angle
- * @param distanceTraveled - distance traveled since last reading
+ * @param distanceTraveled - distance traveled since last sending a leader status message
  */
 void V2VService::leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled) {
     if (followerIp.empty()) return;

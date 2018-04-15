@@ -75,7 +75,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         followRequest(mapOfIps[msg.groupid()]);
                     } else {
                         InternalFollowResponse msg;
-                        msg.groupid(mapOfIds[senderIp]);
+                        msg.groupid(msg.groupid());
                         msg.status(0);
                         internalBroadCast->send(msg);
                     }

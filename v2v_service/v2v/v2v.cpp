@@ -219,7 +219,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                         toLeader.reset();
                         lastLeaderUpdate = 0;
                         
-                        // If it was the leader who sent the stop follow, we should also reset our car and stop it.
+                        // If it was the leader who sent the stop follow, we should also stop our car.
                         stopCar();
                     }
                     

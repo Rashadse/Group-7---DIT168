@@ -63,6 +63,7 @@ public:
 
     void startReportingToFollower();
     void leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled);
+    void processLeaderStatus(LeaderStatus leaderStatusUpdate);
 
     void startReportingToLeader();
     void followerStatus();

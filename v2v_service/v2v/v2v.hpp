@@ -44,7 +44,7 @@ static const int PEDAL_POSITION_READING = 1041;
 static const int GROUND_STEERING_READING = 1045;
 
 // Ultrasonic reading
-static const int DISTANCE_READING = 1039;
+static const float DISTANCE_READING = 1039;
 
 
 struct CarStatus {

@@ -144,7 +144,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     
                     DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
                     
-                    std::cout << msg.distance() * 343/2 << std::endl;
+                    std::cout << msg.distance() << std::endl;
                     
                     break;
                 }

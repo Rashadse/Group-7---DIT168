@@ -141,9 +141,20 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 }
                 case DISTANCE_READING: {
                     DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
-                    float data = msg.distance() * 100;
-                    std::cout << data << std::endl;
-                    if(data <= 20)
+                    sensorRange[index] = msg.distance() * 100;
+                    index++;
+                    if (index ==  5) {
+                       index = 0;
+                    }
+
+                    float sum = 0;
+                    for (int i = 0; i <= 4; i++ ) {
+                        sum += sensorRange[i];
+                    }
+                    float average = sum / 5;
+                    std::cout << average << std::endl;
+
+                    if(average <= 20)
                     {
                     	stopCar();
                         InternalEmergencyBrake stopped; 
@@ -475,7 +486,6 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
 void V2VService::stopCar() {
     opendlv::proxy::GroundSteeringReading steeringMsg;
     opendlv::proxy::PedalPositionReading speedMsg;
-    
     steeringMsg.steeringAngle(0.0);
     speedMsg.percent(0.0);
     motorBroadcast->send(steeringMsg);

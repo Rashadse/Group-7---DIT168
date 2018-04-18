@@ -92,6 +92,9 @@ private:
     std::map<std::string, std::string> mapOfIps;
     std::map<std::string, std::string> mapOfIds;
 
+    float sensorRange[5];
+    int index;
+
     std::string myIp;
     std::string myGroupId;
     

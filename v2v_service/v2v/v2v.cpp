@@ -140,12 +140,15 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     break;
                 }
                 case DISTANCE_READING: {
-                    /* Ignoring distance until an understandable reading can be gotten. */
-                    
                     DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
-                    
-                    std::cout << msg.distance() << std::endl;
-                    
+                    float data = msg.distance() * 100;
+                    std::cout << data << std::endl;
+                    if(data <= 20)
+                    {
+                    	stopCar();
+                        InternalEmergencyBrake stopped; 
+                        internalBroadCast->send(stopped);
+                    }
                     break;
                 }
                 default: {

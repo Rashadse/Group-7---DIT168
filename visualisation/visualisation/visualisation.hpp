@@ -53,34 +53,19 @@ struct CarStatus {
 };
 
 
-class V2VService {
+class V2VService1 {
 public:
-    V2VService(std::string ip, std::string groupId);
+    V2VService1(std::string ip, std::string groupId);
 
-    void announcePresence();
-    void followRequest(std::string vehicleIp);
-    void followResponse();
-    void stopFollow();
-
-    void startReportingToFollower();
-    void leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled);
-
-    void startReportingToLeader();
-    void followerStatus();
-    
-    static uint32_t getTime();
 
     std::string leaderIp;
     std::string followerIp;
 
     uint32_t lastFollowerUpdate;
     uint32_t lastLeaderUpdate;
-    
-    CarStatus *getCurrentCarStatus();
-    CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
 
 private:
-    CarStatus currentCarStatus;
+
 
     std::map<std::string, std::string> mapOfIps;
     std::map<std::string, std::string> mapOfIds;

@@ -19,8 +19,6 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     myGroupId = groupId;
     currentCarStatus.speed = 0;
     currentCarStatus.steeringAngle = 0;
-    currentCarStatus.distanceFront = 0;
-    currentCarStatus.distanceTraveled = 0;
     
     /*
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This channel is where
@@ -380,11 +378,6 @@ void V2VService::startReportingToLeader() {
 
 /**
  * This function sends a FollowerStatus (id = 3001) message on the leader channel.
- *
- * @param speed - current velocity
- * @param steeringAngle - current steering angle
- * @param distanceFront - distance to nearest object in front of the car sending the status message
- * @param distanceTraveled - distance traveled since last reading
  */
 void V2VService::followerStatus() {
     if (leaderIp.empty()) return;
@@ -454,7 +447,7 @@ void V2VService::startReportingToFollower() {
 void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
-    //uint8_t distanceTraveled = leaderStatusUpdate.distanceTraveled();
+    //uint8_t fled = leaderStatusUpdate.distanceTraveled();
     //uint64_t timestamp = leaderStatusUpdate.timestamp();
 
     /*
@@ -537,8 +530,6 @@ CarStatus *V2VService::getCurrentCarStatus() {
 CarStatus *V2VService::setCurrentCarStatus(struct CarStatus *newCarStatus) {
     currentCarStatus.speed = newCarStatus->speed;
     currentCarStatus.steeringAngle = newCarStatus->steeringAngle;
-    currentCarStatus.distanceTraveled = newCarStatus->distanceTraveled;
-    currentCarStatus.distanceFront = newCarStatus->distanceFront;
     return &currentCarStatus;
 }
 

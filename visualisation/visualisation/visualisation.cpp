@@ -1,5 +1,5 @@
 #include <iostream>
-#include "v2v.hpp"
+#include "visualisation.hpp"
 #include <map>
 
 /**
@@ -96,12 +96,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                  case INTERNAL_GET_ALL_GROUPS_REQUEST: {
                      InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
 						visualisation->send(msg);
-                     std::map<std::string, std::string> ipMap = getMapOfIps();
-                     for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
-                        InternalGetAllGroupsResponse msg;
-                        msg.groupid(it->first);
-                        internalBroadCast->send(msg);
-                     }
+
                 break;
                 }
                 case INTERNAL_EMERGENCY_BRAKE: {
@@ -385,14 +380,7 @@ void V2VService::leaderStatus(float speed, float steeringAngle, uint8_t distance
     toFollower->send(encode(leaderStatus));
 }
 
-/**
- * This functions gets a map containing IP addresses of cars & their groupIds as they announced presence in the network.
- *
- * @return mapOfIps - a map containing the IP addresses and the groupIds of all cars that have announced their presence.
- */
-std::map<std::string, std::string> V2VService::getMapOfIps() {
-    return mapOfIps;
-}
+
 
 CarStatus *V2VService::getCurrentCarStatus() {
     return &currentCarStatus;
@@ -406,26 +394,6 @@ CarStatus *V2VService::setCurrentCarStatus(struct CarStatus *newCarStatus) {
     return &currentCarStatus;
 }
 
-void V2VService::healthCheck() {
-    std::map<std::string, std::string> ipMap = getMapOfIps();
-    CarStatus *status = getCurrentCarStatus();
-    std::cout << "V2VService health check" << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "GroupID: " << myGroupId << " IP-address: " << myIp << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "Current Time: " << getTime() << std::endl;
-    std::cout << "Current speed:" << status->speed << std::endl;
-    std::cout << "Current angle:" << status->steeringAngle << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "Follower:     " << followerIp << std::endl;
-    std::cout << "Leader:       " << leaderIp << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "Announced:    " << followerIp << std::endl;
-    for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
-        std::cout << "    Group: " << it->first << " IP: " << it->second << std::endl;
-    }
-    std::cout << "-------------------------" << std::endl;
-}
 
 /**
  * Gets the current time.

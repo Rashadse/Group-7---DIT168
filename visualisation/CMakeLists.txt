@@ -23,12 +23,5 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 
 # Executables -- ADD YOUR SERVICES COMPILATION COMMANDS BELOW
-add_executable(${PROJECT_NAME}-V2VService ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${CMAKE_CURRENT_SOURCE_DIR}/v2v/v2v.cpp)
+add_executable(${PROJECT_NAME}-V2VService ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${CMAKE_CURRENT_SOURCE_DIR}/visualisation/visualisation.cpp)
 target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
-
-
-
-# Testing
-#enable_testing()
-#add_executable(${PROJECT_NAME}-test ${TEST_DIR}/UnitTests.cpp <File to test>)
-#add_test(NAME ${PROJECT_NAME}-test COMMAND ${PROJECT_NAME}-test)

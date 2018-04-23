@@ -67,9 +67,6 @@ public:
 
     void startReportingToLeader();
     void followerStatus();
-
-    std::map<std::string, std::string> getMapOfIps();
-    void healthCheck();
     
     static uint32_t getTime();
 
@@ -92,7 +89,7 @@ private:
     std::string myGroupId;
     
     std::shared_ptr<cluon::OD4Session>  motorBroadcast;
-	std::shared_ptr<cluon::OD4Session>  visualisation;
+    std::shared_ptr<cluon::OD4Session>  visualisation;
     std::shared_ptr<cluon::OD4Session>  internalBroadCast;
     std::shared_ptr<cluon::OD4Session>  broadcast;
     

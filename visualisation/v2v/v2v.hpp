@@ -1,5 +1,5 @@
-#ifndef V2V_PROTOCOL_H
-#define V2V_PROTOCOL_H
+#ifndef VISUALISATION
+#define VISUALISATION
 
 #include <iomanip>
 #include <cstdint>
@@ -107,4 +107,4 @@ private:
     static T decode(std::string data);
 };
 
-#endif // V2V_PROTOCOL_H
+#endif // VISUALISATION

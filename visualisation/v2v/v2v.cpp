@@ -17,6 +17,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
     
 
 //visualisation OD4Session
+// This channel listens to the motor channel, the internal channel and the broadcast channel
+// This channel is used for the visualisation microservice 
    visualisation = std::make_shared<cluon::OD4Session>(
         VISUALIZATION_CHANNEL,
         [](cluon::data::Envelope &&/*envelope*/) noexcept {}
@@ -35,7 +37,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 switch (envelope.dataType()) {
                     case ANNOUNCE_PRESENCE: {
                         AnnouncePresence ap = cluon::extractMessage<AnnouncePresence>(std::move(envelope));
-visualisation->send(ap);
+						visualisation->send(ap);
                         std::cout << "received 'AnnouncePresence' from '"
                                   << ap.vehicleIp() << "', GroupID '"
                                   << ap.groupId() << "'!" << std::endl;                              
@@ -67,12 +69,12 @@ visualisation->send(ap);
                     std::cout << "Announcing presence!" << std::endl;
                     announcePresence();
                     InternalAnnouncePresence msg = cluon::extractMessage<InternalAnnouncePresence>(std::move(envelope));
-visualisation->send(msg);
+					visualisation->send(msg);
                     break;
                 }
                 case INTERNAL_FOLLOW_REQUEST: {
                     InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
-visualisation->send(msg);
+					visualisation->send(msg);
                     if (leaderIp.empty()){
                         followRequest(mapOfIps[msg.groupid()]);                            
                     }                      
@@ -82,7 +84,7 @@ visualisation->send(msg);
                  }
                  case INTERNAL_STOP_FOLLOW_REQUEST: {
                      InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
-visualisation->send(msg);
+					visualisation->send(msg);
                      std::cout << "received '" << msg.LongName() << " for group: " << msg.groupid() << std::endl;
                      stopFollow();
                      InternalStopFollowResponse retmsg;
@@ -93,7 +95,7 @@ visualisation->send(msg);
                  }
                  case INTERNAL_GET_ALL_GROUPS_REQUEST: {
                      InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
-visualisation->send(msg);
+						visualisation->send(msg);
                      std::map<std::string, std::string> ipMap = getMapOfIps();
                      for(std::map<std::string, std::string>::iterator it = ipMap.begin(); it != ipMap.end(); ++it) {
                         InternalGetAllGroupsResponse msg;
@@ -104,7 +106,7 @@ visualisation->send(msg);
                 }
                 case INTERNAL_EMERGENCY_BRAKE: {
                     InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
-visualisation->send(msg);
+					visualisation->send(msg);
                     //Terminate communication
                     stopFollow();
                     
@@ -129,27 +131,23 @@ visualisation->send(msg);
     motorBroadcast = std::make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
         [this](cluon::data::Envelope &&envelope) noexcept {
-            //std::cout << "[MOTOR] ";
-            //std::cout << envelope.dataType() << " ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
-visualisation->send(msg);
-                    //std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+					visualisation->send(msg);
                     currentCarStatus.speed = msg.percent();
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
-visualisation->send(msg);
-                    //std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+					visualisation->send(msg);
                     currentCarStatus.steeringAngle = msg.steeringAngle();
                     break;
                 }
                 default:
-                    std::cout << "Could not understand message" << std::endl;
+                    std::cout << "Received a message that was not understood" << std::endl;
                     break;
             }
         }
@@ -226,14 +224,6 @@ visualisation->send(msg);
                                   << "' from '" << senderIp << "'!" << std::endl;
                         std::cout << "New speed = " << leaderStatus.speed() << std::endl;
                         std::cout << "New steering = " << leaderStatus.steeringAngle() << std::endl;
-                        
-                        /*
-                        opendlv::proxy::GroundSteeringReading steeringMsg;
-                        opendlv::proxy::PedalPositionReading speedMsg;
-                        steeringMsg.steeringAngle(leaderStatus.steeringAngle());
-                        speedMsg.percent(leaderStatus.speed());
-                        motorBroadcast->send(speedMsg);
-                        motorBroadcast->send(steeringMsg);*/
 
                          break;
                      }

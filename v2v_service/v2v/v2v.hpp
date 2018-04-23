@@ -36,7 +36,7 @@ static const int INTERNAL_GET_ALL_GROUPS_REQUEST = 4004;
 static const int INTERNAL_GET_ALL_GROUPS_RESPONSE = 4005;
 static const int INTERNAL_EMERGENCY_BRAKE = 4006;
 static const int INTERNAL_ANNOUNCE_PRESENCE = 4007;
-
+ 
 // Motor Proxy
 static const int MOTOR_BROADCAST_CHANNEL = 180;
 
@@ -78,8 +78,8 @@ public:
     std::string leaderIp;
     std::string followerIp;
 
-    uint32_t lastFollowerUpdate;
-    uint32_t lastLeaderUpdate;
+    uint64_t lastFollowerUpdate;
+    uint64_t lastLeaderUpdate;
     
     CarStatus *getCurrentCarStatus();
     CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);

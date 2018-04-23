@@ -347,7 +347,7 @@ void *sendFollowerStatuses(void *v2v) {
 
         // Since leader updates are more frequent than follower statuses,
         // we disconnect after only two seconds of radio silence.
-        if ((v2vservice->getTime() - v2vservice->lastLeaderUpdate) > 1) {
+        if ((v2vservice->getTime() - v2vservice->lastLeaderUpdate) > 1000) {
             v2vservice->stopFollow();
             break;
         }
@@ -401,7 +401,7 @@ void *sendLeaderStatuses(void *v2v) {
     while (!v2vservice->followerIp.empty()) {   // Report as long as we have a follower
     
         // If no update has been received from follower for more than two seconds, disconnect
-        if ((v2vservice->getTime() - v2vservice->lastFollowerUpdate) > 2) {
+        if ((v2vservice->getTime() - v2vservice->lastFollowerUpdate) > 2000) {
             v2vservice->stopFollow();
             break;
         }
@@ -493,6 +493,9 @@ void V2VService::stopCar() {
  */
 void V2VService::leaderStatus(float speed, float steeringAngle) {
     uint8_t distanceTraveled = 0;
+    if (speed <= 0.15 && speed >= 0.13){
+        distanceTraveled = 7;
+    }
 
     if (followerIp.empty()) return;
     LeaderStatus leaderStatus;

@@ -348,7 +348,7 @@ void *sendFollowerStatuses(void *v2v) {
     while (!v2vservice->leaderIp.empty()) {        
 
         // Since leader updates are more frequent than follower statuses,
-        // we disconnect after only one second of radio silence.
+        // we disconnect after only two seconds of radio silence.
         if ((v2vservice->getTime() - v2vservice->lastLeaderUpdate) > 1) {
             v2vservice->stopFollow();
             break;
@@ -419,8 +419,7 @@ void *sendLeaderStatuses(void *v2v) {
         // Send sensor data
         v2vservice->leaderStatus(
             currentCarStatus->speed,
-            currentCarStatus->steeringAngle,
-            currentCarStatus->distanceTraveled
+            currentCarStatus->steeringAngle
         );
         // Message frequency according to protocol.
         std::this_thread::sleep_for(125ms);
@@ -456,7 +455,7 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
     //uint8_t distanceTraveled = leaderStatusUpdate.distanceTraveled();
-    //uint32_t timestamp = leaderStatusUpdate.timestamp();
+    //uint64_t timestamp = leaderStatusUpdate.timestamp();
 
     /*
      * 1. Process gotten data
@@ -499,7 +498,9 @@ void V2VService::stopCar() {
  * @param steeringAngle - current steering angle
  * @param distanceTraveled - distance traveled since last sending a leader status message
  */
-void V2VService::leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled) {
+void V2VService::leaderStatus(float speed, float steeringAngle) {
+    uint8_t distanceTraveled = 0;
+
     if (followerIp.empty()) return;
     LeaderStatus leaderStatus;
     leaderStatus.timestamp(getTime());
@@ -570,11 +571,13 @@ void V2VService::healthCheck() {
  *
  * @return current time in seconds
  */
-uint32_t V2VService::getTime() {
-    const auto now = std::chrono::system_clock::now();
-    const auto epoch = now.time_since_epoch();
-    const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(epoch);
-    return (uint32_t) seconds.count();
+uint64_t V2VService::getTime() {
+    using namespace std::chrono;
+    
+    milliseconds ms = duration_cast<milliseconds>(
+        system_clock::now().time_since_epoch()
+    );
+    return (uint64_t) ms.count();
 }
 
 /**

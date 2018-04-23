@@ -50,8 +50,6 @@ static const int DISTANCE_READING = 1039;
 struct CarStatus {
     float speed;
     float steeringAngle;
-    uint8_t distanceTraveled;
-    uint8_t distanceFront;
 };
 
 
@@ -66,7 +64,7 @@ public:
     void stopCar();
 
     void startReportingToFollower();
-    void leaderStatus(float speed, float steeringAngle, uint8_t distanceTraveled);
+    void leaderStatus(float speed, float steeringAngle);
     void processLeaderStatus(LeaderStatus leaderStatusUpdate);
 
     void startReportingToLeader();
@@ -75,7 +73,7 @@ public:
     std::map<std::string, std::string> getMapOfIps();
     void healthCheck();
     
-    static uint32_t getTime();
+    static uint64_t getTime();
 
     std::string leaderIp;
     std::string followerIp;

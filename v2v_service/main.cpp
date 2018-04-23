@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
                 break;
             }
             case 5: {
-                v2vService->leaderStatus(0, 0, 0);
+                v2vService->leaderStatus(0, 0);
                 break;
             }
             case 6: {

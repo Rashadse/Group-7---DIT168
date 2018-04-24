@@ -130,6 +130,7 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
                 switch (msg.first) {
                     case FOLLOW_REQUEST: {
                         FollowRequest followRequest = decode<FollowRequest>(msg.second);
+			visualisation->send(followRequest);
                         std::cout << "received '" << followRequest.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
 
@@ -144,6 +145,7 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
                      }
                      case FOLLOW_RESPONSE: {
                          FollowResponse followResponse = decode<FollowResponse>(msg.second);
+			visualisation->send(followResponse);
                          std::cout << "received '" << followResponse.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
 
@@ -156,6 +158,7 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
                      }
                      case STOP_FOLLOW: {
                          StopFollow stopFollow = decode<StopFollow>(msg.second);
+			visualisation->send(stopFollow);
                          std::cout << "received '" << stopFollow.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
 
@@ -172,12 +175,14 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
                      }
                      case FOLLOWER_STATUS: {
                          FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
+			visualisation->send(followerStatus);
                          std::cout << "received '" << followerStatus.LongName()
                                    << "' from '" << senderIp << "'!" << std::endl;
                         break;
                     }
                     case LEADER_STATUS: {
                         LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
+			visualisation->send(leaderStatus);			
                         std::cout << "received '" << leaderStatus.LongName()
                                   << "' from '" << senderIp << "'!" << std::endl;
                         std::cout << "New speed = " << leaderStatus.speed() << std::endl;

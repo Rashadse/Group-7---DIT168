@@ -14,7 +14,7 @@ RUN cd /opt/sources && \
     cd build && \
     cmake -D CMAKE_BUILD_TYPE=Release .. && \
     make && \
-    cp CarServices-V2VService /tmp
+    cp CarServices-VISUALISATION /tmp
     
 # Deploy.
 FROM alpine:3.7
@@ -23,5 +23,5 @@ RUN apk update && \
     apk add libcluon --no-cache --repository https://chrberger.github.io/libcluon/alpine/v3.7 --allow-untrusted && \
     mkdir /opt
 WORKDIR /opt
-COPY --from=builder /tmp/CarServices-V2VService .
-CMD ["./CarServices-V2VService"]
+COPY --from=builder /tmp/CarServices-VISUALISATION .
+CMD ["./CarServices-VISUALISATION"]

@@ -5,7 +5,7 @@
 /**
  * Implementation of the V2VService class as declared in v2v.hpp
  */
-V2VService1::V2VService1(std::string ip, std::string groupId) {
+VIZService::VIZService(std::string ip, std::string groupId) {
     followerIp = "";
     leaderIp = "";
     myIp = ip;
@@ -121,7 +121,7 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
     incoming = std::make_shared<cluon::UDPReceiver>(
             "0.0.0.0",
             DEFAULT_PORT,
-            [this](std::string &&data, std::string &&sender, std::chrono::system_clock::time_point /*&&ts*/) noexcept {
+            [this](std::string &&data, std::string &&sender, 			std::chrono::system_clock::time_point /*&&ts*/) noexcept {
                 std::cout << "[UDP] ";
                 std::pair<int16_t, std::string> msg = extract(data);
 
@@ -131,62 +131,30 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
                     case FOLLOW_REQUEST: {
                         FollowRequest followRequest = decode<FollowRequest>(msg.second);
 			visualisation->send(followRequest);
-                        std::cout << "received '" << followRequest.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
-
-                         // After receiving a FollowRequest, check first if there is currently no car already following.
-                         if (followerIp.empty()) {
-                             followerIp = senderIp; // If no, add the requester to known follower slot and establish a
-                             // sending channel.
-                             toFollower = std::make_shared<cluon::UDPSender>(followerIp, DEFAULT_PORT);
                              
-                         }
                          break;
                      }
                      case FOLLOW_RESPONSE: {
                          FollowResponse followResponse = decode<FollowResponse>(msg.second);
 			visualisation->send(followResponse);
-                         std::cout << "received '" << followResponse.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
 
-                        InternalFollowResponse msg;
-                        msg.groupid(mapOfIds[senderIp]);
-                        msg.status(1);
-                        internalBroadCast->send(msg);
-                        
                          break;
                      }
                      case STOP_FOLLOW: {
                          StopFollow stopFollow = decode<StopFollow>(msg.second);
 			visualisation->send(stopFollow);
-                         std::cout << "received '" << stopFollow.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
 
-                         // Clear either follower or leader slot, depending on current role.
-                         if (senderIp == followerIp) {
-                             followerIp = "";
-                             toFollower.reset();
-                         }
-                         else if (senderIp == leaderIp) {
-                             leaderIp = "";
-                             toLeader.reset();
-                         }
                          break;
                      }
                      case FOLLOWER_STATUS: {
                          FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
 			visualisation->send(followerStatus);
-                         std::cout << "received '" << followerStatus.LongName()
-                                   << "' from '" << senderIp << "'!" << std::endl;
+
                         break;
                     }
                     case LEADER_STATUS: {
                         LeaderStatus leaderStatus = decode<LeaderStatus>(msg.second);
 			visualisation->send(leaderStatus);			
-                        std::cout << "received '" << leaderStatus.LongName()
-                                  << "' from '" << senderIp << "'!" << std::endl;
-                        std::cout << "New speed = " << leaderStatus.speed() << std::endl;
-                        std::cout << "New steering = " << leaderStatus.steeringAngle() << std::endl;
 
                          break;
                      }
@@ -204,7 +172,7 @@ V2VService1::V2VService1(std::string ip, std::string groupId) {
  * @param data - message data to extract header and data from
  * @return pair consisting of the message ID (extracted from the header) and the message data
  */
-std::pair<int16_t, std::string> V2VService1::extract(std::string data) {
+std::pair<int16_t, std::string> VIZService::extract(std::string data) {
     if (data.length() < 10) return std::pair<int16_t, std::string>(-1, "");
     unsigned int id, len;
     std::stringstream ssId(data.substr(0, 4));
@@ -225,7 +193,7 @@ std::pair<int16_t, std::string> V2VService1::extract(std::string data) {
  * @return encoded message
  */
 template <class T>
-std::string V2VService1::encode(T msg) {
+std::string VIZService::encode(T msg) {
     cluon::ToProtoVisitor v;
     msg.accept(v);
     std::stringstream buff;
@@ -244,7 +212,7 @@ std::string V2VService1::encode(T msg) {
  * @return decoded message
  */
 template <class T>
-T V2VService1::decode(std::string data) {
+T VIZService::decode(std::string data) {
     std::stringstream buff(data);
     cluon::FromProtoVisitor v;
     v.decodeFrom(buff);

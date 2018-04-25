@@ -53,22 +53,16 @@ struct CarStatus {
 };
 
 
-class V2VService1 {
+class VIZService {
 public:
-    V2VService1(std::string ip, std::string groupId);
+    VIZService(std::string ip, std::string groupId);
 
 
     std::string leaderIp;
     std::string followerIp;
 
-    uint32_t lastFollowerUpdate;
-    uint32_t lastLeaderUpdate;
-
 private:
 
-
-    std::map<std::string, std::string> mapOfIps;
-    std::map<std::string, std::string> mapOfIds;
 
     std::string myIp;
     std::string myGroupId;
@@ -79,8 +73,6 @@ private:
     std::shared_ptr<cluon::OD4Session>  broadcast;
     
     std::shared_ptr<cluon::UDPReceiver> incoming;
-    std::shared_ptr<cluon::UDPSender>   toLeader;
-    std::shared_ptr<cluon::UDPSender>   toFollower;
 
     static std::pair<int16_t, std::string> extract(std::string data);
     template <class T>

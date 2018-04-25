@@ -4,4 +4,6 @@
 # VM and then transfering the built image to the car will not work.
 
 
-docker build -t group7/visualisation -f Dockerfile .
+docker build -t group7/singleviewer -f Dockerfile.amd64 .
+docker run --rm --net=host -p 8080:8080 group7/singleviewer --cid=182
+

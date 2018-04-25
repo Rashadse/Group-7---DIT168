@@ -63,7 +63,6 @@ public:
 
 private:
 
-
     std::string myIp;
     std::string myGroupId;
     
@@ -71,14 +70,6 @@ private:
     std::shared_ptr<cluon::OD4Session>  visualisation;
     std::shared_ptr<cluon::OD4Session>  internalBroadCast;
     std::shared_ptr<cluon::OD4Session>  broadcast;
-    
-    std::shared_ptr<cluon::UDPReceiver> incoming;
-
-    static std::pair<int16_t, std::string> extract(std::string data);
-    template <class T>
-    static std::string encode(T msg);
-    template <class T>
-    static T decode(std::string data);
 };
 
 #endif // VISUALISATION

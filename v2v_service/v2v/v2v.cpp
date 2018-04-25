@@ -184,6 +184,9 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     FollowRequest followRequest = decode<FollowRequest>(msg.second);
                     std::cout << "[INCOMING] received '" << followRequest.LongName()
                                << "' from '" << senderIp << "'!" << std::endl;
+                               
+                    // Propagate the message to internal for visualization
+                    internalBroadCast->send(followRequest);
 
                     // After receiving a FollowRequest, check first if there is currently no car already following.
                     if (followerIp.empty()) {
@@ -200,6 +203,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     FollowResponse followResponse = decode<FollowResponse>(msg.second);
                     std::cout << "[INCOMING] received '" << followResponse.LongName()
                               << "' from '" << senderIp << "'!" << std::endl;
+                              
+                    internalBroadCast->send(followResponse);
 
                     // Makes sure we do not accept any rogue responses.
                     if (senderIp == leaderIp) {
@@ -216,6 +221,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     StopFollow stopFollow = decode<StopFollow>(msg.second);
                     std::cout << "[INCOMING] received '" << stopFollow.LongName()
                               << "' from '" << senderIp << "'!" << std::endl;
+                              
+                    internalBroadCast->send(stopFollow);
 
                     // Clear either follower or leader slot, depending on current role.
                     if (senderIp == followerIp) {
@@ -238,6 +245,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     FollowerStatus followerStatus = decode<FollowerStatus>(msg.second);
                     std::cout << "[INCOMING] received '" << followerStatus.LongName()
                               << "' from '" << senderIp << "'!" << std::endl;
+                              
+                    internalBroadCast->send(followerStatus);
 
                     // If we have a follower, update the last received time for follower status.
                     if (!followerIp.empty()) {
@@ -251,6 +260,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     std::cout << "[INCOMING] received '" << leaderStatus.LongName() <<
                                  " - New speed = " << leaderStatus.speed() <<
                                  " - New steering = " << leaderStatus.steeringAngle() << std::endl;
+                                 
+                    internalBroadCast->send(leaderStatus);
 
                     // Only process the message if we have a leader.
                     if (!leaderIp.empty()) {

@@ -30,9 +30,9 @@ services:
         - "/dev/input/js0:/dev/input/js0"
         command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-ps4controller --cid=180 --freq=10 --verbose=1"    
         
-        # Visualisation microservice
+        # singleviewer microservice
     web-interface:
-        image: chalmersrevere/opendlv-signal-viewer-multi:v0.0.4
+        image: group7/singleviewer
         network_mode: "host"
         ports:
         - "8080:8080"

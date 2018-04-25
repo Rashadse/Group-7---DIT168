@@ -7,46 +7,74 @@ message opendlv.proxy.PedalPositionReading [id = 1041] {
   float percent [id = 1];
 }
 
+// Message for getting distance value from front ultrasonic
+message opendlv.proxy.DistanceReading [id = 1039] {
+  float distance [id = 1];
+}
+
 // V2V protocol messages
 message AnnouncePresence [id = 1001] {
   string vehicleIp [id = 1];
-  uint16 activePort [id = 2];
   string groupId [id = 3];
 }
 
-message FollowRequest [id = 1002] {
-}
+message FollowRequest [id = 1002] {}
 
-message FollowResponse [id = 1003] {
-  string ntpServerIp [id = 1];
-}
+message FollowResponse [id = 1003] {}
 
 message StopFollow [id = 1004] {
 }
 
 message LeaderStatus [id = 2001] {
-  uint32 timestamp [id = 1];
-  uint8 speed [id = 2];
-  uint8 steeringAngle [id = 3];
+  uint64 timestamp [id = 1];
+  float speed [id = 2];
+  float steeringAngle [id = 3];
   uint8 distanceTraveled [id = 4];
 }
 
 message FollowerStatus [id = 3001] {
-  uint32 timestamp [id = 1];
-  uint8 speed [id = 2];
-  uint8 steeringAngle [id = 3];
-  uint8 distanceFront [id = 4];
-  uint8 distanceTraveled [id = 5];
 }
 
 // Service To Service (STS) messages go below
 
 // Create message by specifying them like below.
 // Please note that every message HAS TO HAVE A UNIQUE ID!
-message ExampleMessage [id = 9999] {
-  // Fields inside the message do not need to be unique, meaning
-  // that this message (ExampleMessage) can have a field with id = 1
-  // while FollowerStatus ALSO can have a field with id = 1. It is only
-  // the id of the WHOLE MESSAGE that needs to be unique.
-  uint32 messageField [id = 1];
+
+// groupid specifies which car to send the follow request to
+message InternalFollowRequest [id = 4000] {
+  string groupid [id = 1];
 }
+
+// The follow response indicates 
+// 1. Which group the follow request was sent to and 
+// 2. If the request was successful (1), or unsuccessful (0)
+message InternalFollowResponse [id = 4001] {
+  string groupid [id = 1];
+  uint8 status [id = 2];
+}
+
+// Stop follow needs to point out which car to send it to, if empty both follower and leader will receive it
+message InternalStopFollow [id = 4002] {
+  string groupid [id = 1];
+}
+
+// Follow response will indicate which car was sent the stop follow message
+message InternalStopFollowResponse [id = 4003] {
+  string groupid [id = 1];
+}
+
+// Send message to announce our own presence in the network
+message InternalAnnouncePresence [id = 4007] {}
+
+// Send this message to V2V in order to get all announced cars
+message InternalGetAllGroupsRequest [id = 4004] {}
+
+// The get all groups response will contain the groupid of a car in the network.
+// Upon the V2V receiving a get all groups request, V2V will send one message per
+// announced car in the network.
+message InternalGetAllGroupsResponse [id = 4005] {
+  string groupid [id = 1];
+}
+
+// Emergency brake should tell all services to stop sending commands to the motor and steering.
+message InternalEmergencyBrake [id = 4006] {}

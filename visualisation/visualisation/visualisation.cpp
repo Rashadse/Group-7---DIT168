@@ -55,36 +55,69 @@ VIZService::VIZService(std::string ip, std::string groupId) {
             
             
             switch (envelope.dataType()) {
+
+		     // Directed communication
+		     case FOLLOW_REQUEST: {
+			FollowRequest msg = cluon::extractMessage<FollowRequest>(std::move(envelope));
+			visualisation->send(msg);
+                             
+                         break;
+                     }
+                     case FOLLOW_RESPONSE: {
+			FollowResponse msg = cluon::extractMessage<FollowResponse>(std::move(envelope));
+			visualisation->send(msg);
+
+                         break;
+                     }
+                     case STOP_FOLLOW: {
+			StopFollow msg = cluon::extractMessage<StopFollow>(std::move(envelope));
+			visualisation->send(msg);
+
+                         break;
+                     }
+                     case FOLLOWER_STATUS: {
+			FollowerStatus msg = cluon::extractMessage<FollowerStatus>(std::move(envelope));
+			visualisation->send(msg);
+
+                        break;
+                    }
+                    case LEADER_STATUS: {
+			LeaderStatus msg = cluon::extractMessage<LeaderStatus>(std::move(envelope));	
+			visualisation->send(msg);			
+
+                         break;
+                     }
+
+		// Internal communication
                 case INTERNAL_ANNOUNCE_PRESENCE: {
                     std::cout << "Announcing presence!" << std::endl;
 
                     InternalAnnouncePresence msg = cluon::extractMessage<InternalAnnouncePresence>(std::move(envelope));
-					visualisation->send(msg);
+			visualisation->send(msg);
                     break;
                 }
                 case INTERNAL_FOLLOW_REQUEST: {
                     InternalFollowRequest msg = cluon::extractMessage<InternalFollowRequest>(std::move(envelope));
-					visualisation->send(msg);
+			visualisation->send(msg);
 
                     break;
                  }
                  case INTERNAL_STOP_FOLLOW_REQUEST: {
                      InternalStopFollow msg = cluon::extractMessage<InternalStopFollow>(std::move(envelope));
-					visualisation->send(msg);
+			visualisation->send(msg);
 
                      break;
                  }
                  case INTERNAL_GET_ALL_GROUPS_REQUEST: {
                      InternalGetAllGroupsRequest msg = cluon::extractMessage<InternalGetAllGroupsRequest>(std::move(envelope));
-						visualisation->send(msg);
+			visualisation->send(msg);
 
                 break;
                 }
                 case INTERNAL_EMERGENCY_BRAKE: {
                     InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
-					visualisation->send(msg);
-                    
-                    std::cout << "received '" << msg.LongName() << std::endl;
+		visualisation->send(msg);
+
                     break;
                 }
                 default: 

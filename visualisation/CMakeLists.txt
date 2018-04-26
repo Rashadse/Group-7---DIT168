@@ -23,9 +23,5 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/messages.cpp
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 
 # Executables -- ADD YOUR SERVICES COMPILATION COMMANDS BELOW
-add_executable(${PROJECT_NAME}-V2VService ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${CMAKE_CURRENT_SOURCE_DIR}/v2v/v2v.cpp)
-target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
-
-add_executable(${PROJECT_NAME}-RC_SIMULATOR ${CMAKE_CURRENT_SOURCE_DIR}/rc_sim.cpp ${CMAKE_BINARY_DIR}/messages.cpp)
-target_link_libraries(${PROJECT_NAME}-RC_SIMULATOR ${CLUON_LIBRARIES})
-
+add_executable(${PROJECT_NAME}-VISUALISATION ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp ${CMAKE_BINARY_DIR}/messages.cpp ${CMAKE_CURRENT_SOURCE_DIR}/visualisation/visualisation.cpp)
+target_link_libraries(${PROJECT_NAME}-VISUALISATION ${CLUON_LIBRARIES})

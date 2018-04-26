@@ -138,6 +138,7 @@ VIZService::VIZService(std::string ip, std::string groupId) {
                     DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
 					visualisation->send(msg);
                     break;
+		}
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
 					visualisation->send(msg);

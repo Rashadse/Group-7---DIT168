@@ -10,7 +10,6 @@ RUN apk update && \
 ADD . /opt/sources
 WORKDIR /opt/sources
 RUN cd /opt/sources && \
-    cp ip.txt /tmp && \
     mkdir build && \
     cd build && \
     cmake -D CMAKE_BUILD_TYPE=Release .. && \
@@ -25,5 +24,4 @@ RUN apk update && \
     mkdir /opt
 WORKDIR /opt
 COPY --from=builder /tmp/CarServices-V2VService .
-COPY --from=builder /tmp/ip.txt .
-CMD ["./CarServices-V2VService"]
+ENTRYPOINT ["./CarServices-V2VService"]

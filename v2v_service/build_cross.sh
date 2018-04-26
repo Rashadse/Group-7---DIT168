@@ -1,3 +1,3 @@
 #!/bin/sh
 
-# NOT SUPPORTED YET!
+docker build -t group7/v2vservice -f Dockerfile.armhf .

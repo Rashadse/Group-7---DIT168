@@ -133,6 +133,11 @@ VIZService::VIZService(std::string ip, std::string groupId) {
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
+
+		 case DISTANCE_READING: {
+                    DistanceReading msg = cluon::extractMessage<DistanceReading>(std::move(envelope));
+					visualisation->send(msg);
+                    break;
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
 					visualisation->send(msg);

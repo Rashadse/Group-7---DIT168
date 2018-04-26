@@ -18,6 +18,8 @@
 static const int BROADCAST_CHANNEL = 250;
 static const int VISUALIZATION_CHANNEL = 182;
 static const int DEFAULT_PORT = 50001;
+static const int DISTANCE_READING = 1039;
+
 
 static const int ANNOUNCE_PRESENCE = 1001;
 static const int FOLLOW_REQUEST = 1002;

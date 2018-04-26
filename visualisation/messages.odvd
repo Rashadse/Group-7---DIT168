@@ -7,6 +7,11 @@ message opendlv.proxy.PedalPositionReading [id = 1041] {
   float percent [id = 1];
 }
 
+// Message for getting distance value from front ultrasonic
+message opendlv.proxy.DistanceReading [id = 1039] {
+  float distance [id = 1];
+}
+
 // V2V protocol messages
 message AnnouncePresence [id = 1001] {
   string vehicleIp [id = 1];
@@ -21,18 +26,13 @@ message StopFollow [id = 1004] {
 }
 
 message LeaderStatus [id = 2001] {
-  uint32 timestamp [id = 1];
-  uint8 speed [id = 2];
-  uint8 steeringAngle [id = 3];
+  uint64 timestamp [id = 1];
+  float speed [id = 2];
+  float steeringAngle [id = 3];
   uint8 distanceTraveled [id = 4];
 }
 
 message FollowerStatus [id = 3001] {
-  uint32 timestamp [id = 1];
-  uint8 speed [id = 2];
-  uint8 steeringAngle [id = 3];
-  uint8 distanceFront [id = 4];
-  uint8 distanceTraveled [id = 5];
 }
 
 // Service To Service (STS) messages go below

@@ -12,36 +12,35 @@ int main() {
     shared_ptr<cluon::OD4Session> internalBroadcast = make_shared<cluon::OD4Session>(
         INTERNAL_BROADCAST_CHANNEL,
         [](cluon::data::Envelope &&envelope) noexcept {
-            cout << "[RC SIM] ";
             
             switch (envelope.dataType()) {
                 case INTERNAL_FOLLOW_RESPONSE: {
                     InternalFollowResponse msg = cluon::extractMessage<InternalFollowResponse>(std::move(envelope));
                     
-                    cout << "Now following group: " << msg.groupid() << " status: " << msg.status() << endl;
+                    cout << "[RC INTERNAL] Now following group: " << msg.groupid() << " status: " << msg.status() << endl;
                     break;
                 }
                 case INTERNAL_STOP_FOLLOW_RESPONSE: {
                     InternalStopFollowResponse msg = cluon::extractMessage<InternalStopFollowResponse>(std::move(envelope));
                     
-                    cout << "Stopped following group: " << msg.groupid() << endl;
+                    cout << "[RC INTERNAL] Stopped following group: " << msg.groupid() << endl;
                     break;
                 }
                 case INTERNAL_GET_ALL_GROUPS_RESPONSE: {
                     InternalGetAllGroupsResponse msg = cluon::extractMessage<InternalGetAllGroupsResponse>(std::move(envelope));
                     
-                    cout << "Got group: " << msg.groupid() << endl;
+                    cout << "[RC INTERNAL] Got group: " << msg.groupid() << endl;
                     break;
                 }
                 case INTERNAL_EMERGENCY_BRAKE: {
                     InternalEmergencyBrake msg = cluon::extractMessage<InternalEmergencyBrake>(std::move(envelope));
                     
-                    cout << "Emergency brake!" << endl;
+                    cout << "[RC INTERNAL] Emergency brake!" << endl;
                     break;
                 }
-                default:
-                    cout << "Got a message I could not understand!" << endl;
+                default: {
                     break;
+                }
             }
         }
     );
@@ -49,28 +48,29 @@ int main() {
     shared_ptr<cluon::OD4Session> motorBroadcast = make_shared<cluon::OD4Session>(
         MOTOR_BROADCAST_CHANNEL,
         [](cluon::data::Envelope &&envelope) noexcept {
-            std::cout << "[RC SIM] ";
             
             using namespace opendlv::proxy;
             switch (envelope.dataType()) {
                 case PEDAL_POSITION_READING: {
                     PedalPositionReading msg = cluon::extractMessage<PedalPositionReading>(std::move(envelope));
                     
-                    std::cout << "Got new pedal position: " << msg.percent() << std::endl;
+                    std::cout << "[RC MOTOR] Got new pedal position: " << msg.percent() << std::endl;
                     break;
                 }
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
                     
-                    std::cout << "Got new steering reading: " << msg.steeringAngle() << std::endl;
+                    std::cout << "[RC MOTOR] Got new steering reading: " << msg.steeringAngle() << std::endl;
                     break;
                 }
-                default:
-                    std::cout << "Could not understand message" << std::endl;
+                default: {
                     break;
+                }
             }
         }
     );
+    float currentSpeed = 0.0;
+    float currentSteering = 0.0;
 
 
     while (true) {
@@ -80,9 +80,11 @@ int main() {
         cout << "(2) InternalStopFollow" << endl;
         cout << "(3) InternalGetAllGroups" << endl;
         cout << "(4) InternalEmergencyBrake" << endl;
-        cout << "(5) Pump the gas!" << endl;
-        cout << "(6) Veer to the side!" << endl;
-        cout << "(7) Announce your presence!" << endl;
+        cout << "(5) Increase speed!" << endl;
+        cout << "(6) Decrease speed!" << endl;
+        cout << "(7) Turn left!" << endl;
+        cout << "(8) Turn right!" << endl;
+        cout << "(9) Announce your presence!" << endl;
         cout << "(#) Nothing, just quit." << endl;
         cout << ">> ";
         cin >> choice;
@@ -122,25 +124,49 @@ int main() {
                 break;
             }
             case 5: {
+                if (currentSpeed < 0.25) {
+                    currentSpeed += 0.05;
+                }   
                 using namespace opendlv::proxy;
                 PedalPositionReading msg;
-                msg.percent(0.0);
+                msg.percent(currentSpeed);
                 motorBroadcast->send(msg);
                 break;
             }
             case 6: {
+                if (currentSpeed > 0.0) {
+                    currentSpeed -= 0.05;
+                }            
                 using namespace opendlv::proxy;
-                GroundSteeringReading msg;
-                msg.steeringAngle(0.0);
+                PedalPositionReading msg;
+                msg.percent(currentSpeed);
                 motorBroadcast->send(msg);
                 break;
             }
             case 7: {
+                currentSteering += 0.05;
+                using namespace opendlv::proxy;
+                GroundSteeringReading msg;
+                msg.steeringAngle(currentSteering);
+                motorBroadcast->send(msg);
+                break;
+            }
+            case 8: {
+                currentSteering -= 0.05;
+                using namespace opendlv::proxy;
+                GroundSteeringReading msg;
+                msg.steeringAngle(currentSteering);
+                motorBroadcast->send(msg);
+                break;
+            }
+            case 9: {
                 InternalAnnouncePresence msg;
                 internalBroadcast->send(msg);
                 break;
             }
-            default: return 0;
+            default: {
+                return 0;
+            }
         }
     }
 }

@@ -301,6 +301,8 @@ void V2VService::followRequest(std::string vehicleIp) {
     toLeader = std::make_shared<cluon::UDPSender>(leaderIp, DEFAULT_PORT);
     FollowRequest followRequest;
     toLeader->send(encode(followRequest));
+    
+    internalBroadCast->send(followRequest);
 }
 
 /**
@@ -311,6 +313,8 @@ void V2VService::followResponse() {
     if (followerIp.empty()) return;
     FollowResponse followResponse;
     toFollower->send(encode(followResponse));
+    
+    internalBroadCast->send(followResponse);
 }
 
 /**
@@ -339,6 +343,8 @@ void V2VService::stopFollow() {
     // Clear timestamps
     lastFollowerUpdate = 0;
     lastLeaderUpdate = 0;
+    
+    internalBroadCast->send(stopFollow);
 }
 
 /**
@@ -394,6 +400,8 @@ void V2VService::followerStatus() {
     if (leaderIp.empty()) return;
     FollowerStatus followerStatus;
     toLeader->send(encode(followerStatus));
+    
+    internalBroadCast->send(followerStatus);
 }
 
 /**
@@ -515,6 +523,8 @@ void V2VService::leaderStatus(float speed, float steeringAngle) {
     leaderStatus.steeringAngle(steeringAngle);
     leaderStatus.distanceTraveled(distanceTraveled);
     toFollower->send(encode(leaderStatus));
+    
+    internalBroadCast->send(leaderStatus);
 }
 
 /**

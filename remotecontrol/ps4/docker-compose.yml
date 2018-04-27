@@ -20,13 +20,6 @@
 version: '2'
 
 services:
-    odsupercomponent:
-        image: ${IMAGE_ARM}
-        network_mode: "host"
-        restart: always
-        volumes:
-        - .:/opt/miniature.data
-        command: "/opt/od4/bin/odsupercomponent --cid=${CID} --verbose=1 --configuration=/opt/miniature.data/configuration"
 
     # micro service for PS4 controller.
     proxy-miniature-ps4controller:
@@ -36,15 +29,4 @@ services:
         devices:
         - "/dev/input/js0:/dev/input/js0"
         command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-ps4controller --cid=${CID} --freq=10 --verbose=1"
-
-    proxy-miniature-pwm-motor:
-        image: ${IMAGE_ARM}
-        network_mode: "host"
-        restart: always
-        privileged: true
-        volumes:
-        - /sys/:/sys/
-        - /dev/:/dev/
-        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=${CID} --freq=50 --id=1"
-
 

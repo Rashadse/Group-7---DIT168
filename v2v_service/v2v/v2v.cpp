@@ -149,15 +149,15 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     for (int i = 0; i <= 4; i++ ) {
                         sum += sensorRange[i];
                     }
-                    float average = sum / 5;
+                    //float average = sum / 5;
                     //std::cout << average << std::endl;
 
-                    if(average <= 40)
-                    {
-                    	stopCar();
-                        InternalEmergencyBrake stopped; 
-                        internalBroadCast->send(stopped);
-                    }
+                    //if(average <= 40)
+                    //{
+                    //	stopCar();
+                    //    InternalEmergencyBrake stopped; 
+                    //    internalBroadCast->send(stopped);
+                    //}
                     break;
                 }
                 default: {

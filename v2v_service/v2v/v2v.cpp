@@ -466,7 +466,7 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
     
-    if (speed == 0) {
+    if (speed == 0) { // Maybe add a higher lower bound since car does not move until 15~ percent?
         /* No point in logging a speed of 0 since any included steering will have no effect to movement. */
         return;
     }

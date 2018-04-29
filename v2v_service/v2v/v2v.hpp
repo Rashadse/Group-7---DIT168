@@ -4,15 +4,20 @@
 #include <iomanip>
 #include <cstdint>
 #include <sys/time.h>
+
 #include <map>
+#include <queue>
 #include <string>
+
 #include <pthread.h>
 
 #include "cluon/OD4Session.hpp"
 #include "cluon/UDPSender.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/Envelope.hpp"
+
 #include "messages.hpp"
+
 
 // V2V external
 static const int BROADCAST_CHANNEL = 250;
@@ -57,34 +62,43 @@ class V2VService {
 public:
     V2VService(std::string ip, std::string groupId);
 
+    // V2V message functions
     void announcePresence();
     void followRequest(std::string vehicleIp);
     void followResponse();
     void stopFollow();
     void stopCar();
 
+    // Leading
     void startReportingToFollower();
     void leaderStatus(float speed, float steeringAngle);
+    
+    // Following
     void processLeaderStatus(LeaderStatus leaderStatusUpdate);
-
     void startReportingToLeader();
     void followerStatus();
-
-    std::map<std::string, std::string> getMapOfIps();
+    
+    // Testing
     void healthCheck();
+    
+    // Utility
+    std::map<std::string, std::string> getMapOfIps();
     
     static uint64_t getTime();
 
+    CarStatus *getCurrentCarStatus();
+    CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
+
+    // V2V public status fields 
     std::string leaderIp;
     std::string followerIp;
 
     uint64_t lastFollowerUpdate;
     uint64_t lastLeaderUpdate;
     
-    CarStatus *getCurrentCarStatus();
-    CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
-
 private:
+    std::queue<std::pair<std::chrono::milliseconds, LeaderStatus>> leaderUpdates;
+
     CarStatus currentCarStatus;
 
     std::map<std::string, std::string> mapOfIps;

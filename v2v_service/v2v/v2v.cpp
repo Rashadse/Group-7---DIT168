@@ -465,13 +465,12 @@ void V2VService::startReportingToFollower() {
 void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
-    //uint8_t fled = leaderStatusUpdate.distanceTraveled();
-    //uint64_t timestamp = leaderStatusUpdate.timestamp();
-
-    /*
-     * 1. Process gotten data
-     */
-
+    
+    if (speed == 0) {
+        /* No point in logging a speed of 0 since any included steering will have no effect to movement. */
+        return;
+    }
+    
     opendlv::proxy::GroundSteeringReading steeringMsg;
     opendlv::proxy::PedalPositionReading speedMsg;
     steeringMsg.steeringAngle(steering);

@@ -463,10 +463,6 @@ void V2VService::startReportingToFollower() {
  * @param leaderStatusUpdate - latest status update from leading vehicle to process
  */
 void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
-    opendlv::proxy::GroundSteeringReading steeringMsg;
-    opendlv::proxy::PedalPositionReading speedMsg;
-
-    float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
     
     if (speed == 0) { // Maybe add a higher lower bound since car does not move until 15~ percent?
@@ -474,14 +470,25 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
         No point in logging (inserting into queue) a speed of 0 since any included steering will 
         have no effect to movement. 
         */
+        opendlv::proxy::PedalPositionReading speedMsg;
         speedMsg.percent(speed);        
         motorBroadcast->send(speedMsg);        
-
         return;
     } else {
+        std::pair<uint64_t, LeaderStatus> update;
+    
+        if (lastLeaderUpdate == 0) { // If the last leader update was not registered yet for 
+                                     // some reason, use the default time delay.
+            update.first = 125;
+        } else {
+            update.first = getTime() - lastLeaderUpdate;
+        }
         
+        update.second = leaderStatusUpdate;
+        leaderUpdates.push(update);
     }
     
+    lastLeaderUpdate = getTime(); 
 }
 
 /**

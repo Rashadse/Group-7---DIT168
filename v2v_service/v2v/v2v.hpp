@@ -97,7 +97,7 @@ public:
     uint64_t lastLeaderUpdate;
     
 private:
-    std::queue<std::pair<std::chrono::milliseconds, LeaderStatus>> leaderUpdates;
+    std::queue<std::pair<uint64_t, LeaderStatus>> leaderUpdates;
 
     CarStatus currentCarStatus;
 

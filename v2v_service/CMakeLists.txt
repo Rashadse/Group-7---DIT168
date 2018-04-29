@@ -29,3 +29,6 @@ target_link_libraries(${PROJECT_NAME}-V2VService ${CLUON_LIBRARIES})
 add_executable(${PROJECT_NAME}-RC_SIMULATOR ${CMAKE_CURRENT_SOURCE_DIR}/rc_sim.cpp ${CMAKE_BINARY_DIR}/messages.cpp)
 target_link_libraries(${PROJECT_NAME}-RC_SIMULATOR ${CLUON_LIBRARIES})
 
+add_executable(${PROJECT_NAME}-FL_SIMULATOR ${CMAKE_CURRENT_SOURCE_DIR}/fl_sim.cpp ${CMAKE_BINARY_DIR}/messages.cpp)
+target_link_libraries(${PROJECT_NAME}-FL_SIMULATOR ${CLUON_LIBRARIES})
+

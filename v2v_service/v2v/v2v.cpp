@@ -264,10 +264,9 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                     internalBroadCast->send(leaderStatus);
 
                     // Only process the message if we have a leader.
-                    if (!leaderIp.empty()) {
-                        lastLeaderUpdate = getTime();
+                    //if (!leaderIp.empty()) {
                         processLeaderStatus(leaderStatus);
-                    }
+                    //}
                     break;
                 }
                 default: {

@@ -447,7 +447,7 @@ void *executeLeaderUpdates(void *v2v) {
              * Necessary for a special case where during the above sleep the leader stops moving and we execute the
              * command towards the motor anyway. We should then fall into here and stop the car shortly thereafter.
              */
-            stopCar();
+            v2vservice->stopCar();
             std::this_thread::sleep_for(50ms);
         }
     }

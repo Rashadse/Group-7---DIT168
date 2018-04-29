@@ -431,8 +431,8 @@ void *executeLeaderUpdates(void *v2v) {
 
         if (v2vservice->isLeaderMoving) {
             /*
-            If leader is moving, pop the update queue and wait for the set time before actuating.
-            */
+             * If leader is moving, pop the update queue and wait for the set time before actuating.
+             */
             currentUpdate = updateQueue->front();
             updateQueue->pop();
             std::chrono::milliseconds sleepTime(currentUpdate.first);
@@ -443,11 +443,13 @@ void *executeLeaderUpdates(void *v2v) {
             v2vservice->sendSpeed(leaderStatus.steeringAngle());
             
         } else {
-            /* If leader is not moving, wait for the standard leaderstatus delay and try again. */
-            std::this_thread::sleep_for(125ms);
+            /*
+             * Necessary for a special case where during the above sleep the leader stops moving and we execute the
+             * command towards the motor anyway. We should then fall into here and stop the car shortly thereafter.
+             */
+            stopCar();
+            std::this_thread::sleep_for(50ms);
         }
-
-
     }
 
     pthread_exit(NULL);
@@ -564,8 +566,11 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
  * Sends actuating messages to motor channel to stop the car.
  */
 void V2VService::stopCar() {
-    sendSteering(0.0);
-    sendSpeed(0.0);
+
+    if (currentCarStatus.speed > 0) {
+        sendSteering(0.0);
+        sendSpeed(0.0);
+    }
 }
 
 void V2VService::sendSteering(float steering) {

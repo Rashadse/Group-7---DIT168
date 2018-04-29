@@ -208,6 +208,7 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
                     // Makes sure we do not accept any rogue responses.
                     if (senderIp == leaderIp) {
+                        isLeaderMoving = false;
                         startReportingToLeader();
 
                         InternalFollowResponse msg;
@@ -343,6 +344,8 @@ void V2VService::stopFollow() {
     lastFollowerUpdate = 0;
     lastLeaderUpdate = 0;
     
+    isLeaderMoving = false;
+    
     internalBroadCast->send(stopFollow);
 }
 
@@ -470,11 +473,14 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
         No point in logging (inserting into queue) a speed of 0 since any included steering will 
         have no effect to movement. 
         */
+        isLeaderMoving = false; // This is to make sure we only move then the leader does.
+        
         opendlv::proxy::PedalPositionReading speedMsg;
         speedMsg.percent(speed);        
-        motorBroadcast->send(speedMsg);        
-        return;
+        motorBroadcast->send(speedMsg);
     } else {
+        isLeaderMoving = true; // This is to make sure we only move when the leader does.
+    
         std::pair<uint64_t, LeaderStatus> update;
     
         if (lastLeaderUpdate == 0) { // If the last leader update was not registered yet for 

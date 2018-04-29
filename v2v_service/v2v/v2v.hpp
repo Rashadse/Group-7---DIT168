@@ -97,6 +97,7 @@ public:
     uint64_t lastLeaderUpdate;
     
 private:
+    bool isLeaderMoving;
     std::queue<std::pair<uint64_t, LeaderStatus>> leaderUpdates;
 
     CarStatus currentCarStatus;

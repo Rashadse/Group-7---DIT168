@@ -9,7 +9,12 @@ std::string encode(T msg);
 
 
 using namespace std;
-int main(int /*argc*/, char** argv) {
+int main(int argc, char** argv) {
+    if (argc == 1) {
+        cout << "Provide IP of target" << endl;
+        exit(1);
+    }
+
     string ip = argv[1]; // For UDP-sender
     
     float currentSpeed = 0;
@@ -53,8 +58,11 @@ int main(int /*argc*/, char** argv) {
                     sender->send(encode(ls));
                     numberOfUpdates += 1;
                     
+                    cout << "|" << std::flush;
+
                     std::this_thread::sleep_for(125ms);
                 }
+                cout << endl;
                 
                 break;
             }

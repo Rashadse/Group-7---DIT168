@@ -208,8 +208,11 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
                     // Makes sure we do not accept any rogue responses.
                     if (senderIp == leaderIp) {
-                        isLeaderMoving = false;
+                        isLeaderMoving = false; // Until we receive the first leader status, we assume the leader is standstill.
+                        
                         startReportingToLeader();
+                        
+                        startFollowing();
 
                         InternalFollowResponse msg;
                         msg.groupid(mapOfIds[senderIp]);
@@ -407,6 +410,67 @@ void V2VService::followerStatus() {
 }
 
 /**
+ * This function is designed to be the target of a pthread starting. It will take care of sending FollowerStatus
+ * messages to the leading car as well as check that the leading car has been sending regular updates.
+ *
+ * @param v2v - the v2v service object reference from which this thread function will both take and get information from
+ * @return N/A
+ */
+void *executeLeaderUpdates(void *v2v) {
+    V2VService *v2vservice;
+    v2vservice = (V2VService *)v2v;
+
+    std::queue<std::pair<uint64_t, LeaderStatus>> *updateQueue;
+    updateQueue = v2vservice->getLeaderUpdates(); // Get reference to leader status update queue
+    std::cout << "Execute leader updates thread started!" << std::endl;
+
+    std::pair<uint64_t, LeaderStatus> currentUpdate;
+
+    using namespace std::chrono_literals;
+    while (!v2vservice->leaderIp.empty()) {        
+
+        if (v2vservice->isLeaderMoving) {
+            /*
+            If leader is moving, pop the update queue and wait for the set time before actuating.
+            */
+            currentUpdate = updateQueue->front();
+            updateQueue->pop();
+            std::chrono::milliseconds sleepTime(currentUpdate.first);
+            std::this_thread::sleep_for(sleepTime);
+            
+            LeaderStatus leaderStatus = currentUpdate.second;
+            v2vservice->sendSteering(leaderStatus.speed());
+            v2vservice->sendSpeed(leaderStatus.steeringAngle());
+            
+        } else {
+            /* If leader is not moving, wait for the standard leaderstatus delay and try again. */
+            std::this_thread::sleep_for(125ms);
+        }
+
+
+    }
+
+    pthread_exit(NULL);
+}
+
+/**
+ * This function starts the thread that will take care of sending statuses to the leading vehicle.
+ */
+void V2VService::startFollowing() {
+    // Get time before reporting was started to break connection in case no updates are received for over one second
+    lastLeaderUpdate = getTime();
+
+    int status;
+    pthread_t threadId;
+    status = pthread_create(&threadId, NULL, executeLeaderUpdates, (void *)this);
+    
+    // pthread_create returns 1 if an error occured.
+    if (status) {
+        std::cout << "Error creating update leader thread" << std::endl;
+    }
+}
+
+/**
  * This function is designed to be the target of a pthread starting. It will take care of sending LeaderStatus messages
  * to the following car as well as check that the following car has been sending regular updates.
  *
@@ -501,11 +565,19 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
  * Sends actuating messages to motor channel to stop the car.
  */
 void V2VService::stopCar() {
+    sendSteering(0.0);
+    sendSpeed(0.0);
+}
+
+void V2VService::sendSteering(float steering) {
     opendlv::proxy::GroundSteeringReading steeringMsg;
-    opendlv::proxy::PedalPositionReading speedMsg;
-    steeringMsg.steeringAngle(0.0);
-    speedMsg.percent(0.0);
+    steeringMsg.steeringAngle(steering);
     motorBroadcast->send(steeringMsg);
+}
+
+void V2VService::sendSpeed(float speed) {
+    opendlv::proxy::PedalPositionReading speedMsg;
+    speedMsg.percent(speed);
     motorBroadcast->send(speedMsg);
 }
 
@@ -549,6 +621,10 @@ std::map<std::string, std::string> V2VService::getMapOfIps() {
  */
 CarStatus *V2VService::getCurrentCarStatus() {
     return &currentCarStatus;
+}
+
+std::queue<std::pair<uint64_t, LeaderStatus>> *V2VService::getLeaderUpdates() {
+    return &leaderUpdates;
 }
 
 /**

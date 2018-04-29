@@ -77,6 +77,7 @@ public:
     void processLeaderStatus(LeaderStatus leaderStatusUpdate);
     void startReportingToLeader();
     void followerStatus();
+    void startFollowing();
     
     // Testing
     void healthCheck();
@@ -88,6 +89,13 @@ public:
 
     CarStatus *getCurrentCarStatus();
     CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
+    
+    std::queue<std::pair<uint64_t, LeaderStatus>> *getLeaderUpdates();
+    
+    bool isLeaderMoving;
+    
+    void sendSteering(float steering);
+    void sendSpeed(float speed);
 
     // V2V public status fields 
     std::string leaderIp;
@@ -97,7 +105,6 @@ public:
     uint64_t lastLeaderUpdate;
     
 private:
-    bool isLeaderMoving;
     std::queue<std::pair<uint64_t, LeaderStatus>> leaderUpdates;
 
     CarStatus currentCarStatus;

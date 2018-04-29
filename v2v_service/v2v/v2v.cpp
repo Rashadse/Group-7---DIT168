@@ -457,7 +457,6 @@ void *executeLeaderUpdates(void *v2v) {
  * This function starts the thread that will take care of sending statuses to the leading vehicle.
  */
 void V2VService::startFollowing() {
-    // Get time before reporting was started to break connection in case no updates are received for over one second
     lastLeaderUpdate = getTime();
 
     int status;

@@ -463,30 +463,25 @@ void V2VService::startReportingToFollower() {
  * @param leaderStatusUpdate - latest status update from leading vehicle to process
  */
 void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
+    opendlv::proxy::GroundSteeringReading steeringMsg;
+    opendlv::proxy::PedalPositionReading speedMsg;
+
     float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
     
     if (speed == 0) { // Maybe add a higher lower bound since car does not move until 15~ percent?
-        /* No point in logging a speed of 0 since any included steering will have no effect to movement. */
+        /* 
+        No point in logging (inserting into queue) a speed of 0 since any included steering will 
+        have no effect to movement. 
+        */
+        speedMsg.percent(speed);        
+        motorBroadcast->send(speedMsg);        
+
         return;
+    } else {
+        
     }
     
-    opendlv::proxy::GroundSteeringReading steeringMsg;
-    opendlv::proxy::PedalPositionReading speedMsg;
-    steeringMsg.steeringAngle(steering);
-    speedMsg.percent(speed);
-
-    /*
-     * 2. Wait until you have traveled <distanceTraveled>, take into account the time delay using the timestamp
-     */
-
-    // wait
-
-    /*
-     * 3. Actuate against motor channel
-     */
-    motorBroadcast->send(steeringMsg);
-    motorBroadcast->send(speedMsg);
 }
 
 /**

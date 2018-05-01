@@ -473,7 +473,6 @@ void V2VService::startFollowing() {
 
     // Empty the old queue since new following has been initialised.
     std::queue<std::pair<uint64_t, LeaderStatus>> newQueue;
-    std::swap(leaderUpdates, newQueue);
 
     /*
      * This will prefill the leader status queue with updates to go the first 1 meter straight,
@@ -492,9 +491,25 @@ void V2VService::startFollowing() {
         initialUpdate.first = 125; // Standard delay
         initialUpdate.second = leaderStatus;
 
-        leaderUpdates.push(initialUpdate);
+        newQueue.push(initialUpdate);
     }
     std::cout << "Pre fill took " << (getTime() - time) << "ms" << std::endl;
+    /*
+     * Perform swap here to avoid problem where leader statuses get filled simultaneously, that's because the sequence
+     * looks like this:
+     *
+     * Other car                    Our car
+     *     |  <-- Follow Request ----  |
+     *     |  --- Follow Response -->  |
+     * < Starts sending >     < Start listening >
+     *     |                           |
+     *
+     * If we do not swap the queues here, we could get interfering leader statuses during the pre fill which will be
+     * erroneously inserted in the middle of the "pre fill" updates, meaning the car could suddenly turn slightly
+     * during ramp-up. Swapping here makes sure that even if we received some updates during pre fill, they will be
+     * ignored. Trade off, but should not mean losing more than 1 update in the absolute worst case.
+     */
+    std::swap(leaderUpdates, newQueue);
 
     int status;
     pthread_t threadId;

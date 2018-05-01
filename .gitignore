@@ -5,4 +5,3 @@ bin/
 cmake-build-debug/
 build/
 ip.txt
-test.*

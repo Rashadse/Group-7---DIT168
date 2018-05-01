@@ -575,14 +575,22 @@ void V2VService::stopCar() {
 
 void V2VService::sendSteering(float steering) {
     opendlv::proxy::GroundSteeringReading steeringMsg;
-    steeringMsg.steeringAngle(steering);
+
+    steeringMsg.steeringAngle(steering + (steeringOffset));
     motorBroadcast->send(steeringMsg);
 }
 
 void V2VService::sendSpeed(float speed) {
     opendlv::proxy::PedalPositionReading speedMsg;
-    speedMsg.percent(speed);
-    motorBroadcast->send(speedMsg);
+
+    // Offset only applies for speeds > 0.
+    if (speed == 0) {
+        speedMsg.percent(speed);
+        motorBroadcast->send(speedMsg);
+    } else {
+        speedMsg.percent(speed + (speedOffset));
+        motorBroadcast->send(speedMsg);
+    }
 }
 
 /**

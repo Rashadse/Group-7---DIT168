@@ -115,6 +115,9 @@ private:
     float sensorRange[5];
     int index;
 
+    float speedOffset = 0.0;
+    float steeringOffset = 0.0;
+
     std::string myIp;
     std::string myGroupId;
     

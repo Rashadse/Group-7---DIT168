@@ -267,10 +267,10 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                                  
                     internalBroadCast->send(leaderStatus);
 
-                    // Only process the message if we have a leader.
-                    //if (!leaderIp.empty()) {
+                    // Only process the messages from the leader.
+                    if (senderIp == leaderIp) {
                         processLeaderStatus(leaderStatus);
-                    //}
+                    }
                     break;
                 }
                 default: {
@@ -436,8 +436,10 @@ void *executeLeaderUpdates(void *v2v) {
             currentUpdate = updateQueue->front();
             updateQueue->pop();
             std::chrono::milliseconds sleepTime(currentUpdate.first);
+            std::cout << "Sleeping for before executing queued update..." << std::endl;
             std::this_thread::sleep_for(sleepTime);
-            
+
+            std::cout << "Executing queued leader status!" << std::endl;
             LeaderStatus leaderStatus = currentUpdate.second;
             v2vservice->sendSteering(leaderStatus.speed());
             v2vservice->sendSpeed(leaderStatus.steeringAngle());
@@ -540,9 +542,7 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
         */
         isLeaderMoving = false; // This is to make sure we only move then the leader does.
         
-        opendlv::proxy::PedalPositionReading speedMsg;
-        speedMsg.percent(speed);        
-        motorBroadcast->send(speedMsg);
+        sendSpeed(speed);
     } else {
         isLeaderMoving = true; // This is to make sure we only move when the leader does.
     
@@ -552,6 +552,7 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
                                      // some reason, use the default time delay.
             update.first = 125;
         } else {
+            // Actual time between updates
             update.first = getTime() - lastLeaderUpdate;
         }
         

@@ -429,7 +429,8 @@ void *executeLeaderUpdates(void *v2v) {
     using namespace std::chrono_literals;
     while (!v2vservice->leaderIp.empty()) {        
 
-        if (v2vservice->isLeaderMoving) {
+        // If leader car is moving and the update queue is not empty...
+        if (v2vservice->isLeaderMoving && !updateQueue->empty()) {
             /*
              * If leader is moving, pop the update queue and wait for the set time before actuating.
              */
@@ -444,13 +445,20 @@ void *executeLeaderUpdates(void *v2v) {
             v2vservice->sendSteering(leaderStatus.speed());
             v2vservice->sendSpeed(leaderStatus.steeringAngle());
             
-        } else {
+        } else if (!updateQueue->empty()) {
             /*
              * Necessary for a special case where during the above sleep the leader stops moving and we execute the
              * command towards the motor anyway. We should then fall into here and stop the car shortly thereafter.
              */
             v2vservice->stopCar();
             std::this_thread::sleep_for(50ms);
+        } else {
+            // We could come into a scenario where leader statuses simply do not get sent, at which point we have to
+            // abort the following. This case should really not happen since we will disconnect if there has been more
+            // than 1000ms between updates. Mostly for debugging purposes.
+            std::cout << "Update queue empty! Did no leader statuses get sent?" << std::endl;
+            v2vservice->stopCar();
+            break;
         }
     }
 
@@ -462,6 +470,31 @@ void *executeLeaderUpdates(void *v2v) {
  */
 void V2VService::startFollowing() {
     lastLeaderUpdate = getTime();
+
+    // Empty the old queue since new following has been initialised.
+    std::queue<std::pair<uint64_t, LeaderStatus>> newQueue;
+    std::swap(leaderUpdates, newQueue);
+
+    /*
+     * This will prefill the leader status queue with updates to go the first 1 meter straight,
+     * right now takes about 3 seconds in total at 15% power and (naturally) 0.0 steering.
+     *
+     * 125ms * 24 = 3000ms = 3 seconds.
+     */
+    std::cout << "Starting to pre fill update queue" << std::endl;
+    uint64_t time = getTime();
+    for (int i = 0; i < 24; i++) {
+        std::pair<uint64_t, LeaderStatus> initialUpdate;
+        LeaderStatus leaderStatus;
+        leaderStatus.speed(0.15);
+        leaderStatus.steeringAngle(0.0);
+
+        initialUpdate.first = 125; // Standard delay
+        initialUpdate.second = leaderStatus;
+
+        leaderUpdates.push(initialUpdate);
+    }
+    std::cout << "Pre fill took " << (getTime() - time) << "ms" << std::endl;
 
     int status;
     pthread_t threadId;

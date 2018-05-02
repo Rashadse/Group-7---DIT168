@@ -627,7 +627,11 @@ void V2VService::stopCar() {
 void V2VService::sendSteering(float steering) {
     opendlv::proxy::GroundSteeringReading steeringMsg;
 
-    steeringMsg.steeringAngle(steering + (steeringOffset));
+    if (steering == 0) {
+        steeringMsg.steeringAngle(steering + (steeringOffset));
+    } else {
+        steeringMsg.steeringAngle(steering);
+    }
     motorBroadcast->send(steeringMsg);
 }
 

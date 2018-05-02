@@ -450,7 +450,7 @@ void *executeLeaderUpdates(void *v2v) {
             v2vservice->sendSpeed(leaderStatus.speed());
             v2vservice->sendSteering(leaderStatus.steeringAngle());
             
-        } else if (!updateQueue->empty()) {
+        } else if (!v2vservice->isLeaderMoving) {
             /*
              * Necessary for a special case where during the above sleep the leader stops moving and we execute the
              * command towards the motor anyway. We should then fall into here and stop the car shortly thereafter.

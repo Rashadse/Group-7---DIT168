@@ -452,7 +452,7 @@ void *executeLeaderUpdates(void *v2v) {
 
             // If we're evening out...
             if (leaderStatus.steeringAngle() == 0 && lastSteering > 0) {
-                std::this_thread::sleep_for(300ms);
+                std::this_thread::sleep_for(200ms);
             }
 
             v2vservice->sendSpeed(leaderStatus.speed());
@@ -491,7 +491,7 @@ void V2VService::startFollowing() {
      */
     std::cout << "Starting to pre fill update queue" << std::endl;
     uint64_t time = getTime();
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 9; i++) {
         std::pair<uint64_t, LeaderStatus> initialUpdate;
         LeaderStatus leaderStatus;
         leaderStatus.speed(0.15);
@@ -607,11 +607,11 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     
         if (lastLeaderUpdate == 0) { // If the last leader update was not registered yet for 
                                      // some reason, use the default time delay.
-            update.first = 150;
+            update.first = 125;
         } else {
             // Actual time between updates
             //update.first = getTime() - lastLeaderUpdate;
-            update.first = 150;
+            update.first = 125;
         }
         
         update.second = leaderStatusUpdate;
@@ -638,7 +638,7 @@ void V2VService::sendSteering(float steering) {
     if (steering == 0) {
         steeringMsg.steeringAngle(steering + (steeringOffset));
     } else {
-        steeringMsg.steeringAngle(steering);
+        steeringMsg.steeringAngle(steering * 2);
     }
     motorBroadcast->send(steeringMsg);
 }

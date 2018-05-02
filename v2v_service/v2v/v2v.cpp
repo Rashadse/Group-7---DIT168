@@ -425,6 +425,14 @@ void *executeLeaderUpdates(void *v2v) {
     std::cout << "Execute leader updates thread started!" << std::endl;
 
     std::pair<uint64_t, LeaderStatus> currentUpdate;
+    LeaderStatus leaderStatus;
+    
+    
+    currentUpdate = updateQueue->front();
+    updateQueue->pop();
+    leaderStatus = currentUpdate.second;
+    v2vservice->sendSpeed(leaderStatus.speed());
+    v2vservice->sendSteering(leaderStatus.steeringAngle());
 
     using namespace std::chrono_literals;
     while (!v2vservice->leaderIp.empty()) {        
@@ -442,8 +450,8 @@ void *executeLeaderUpdates(void *v2v) {
 
             std::cout << "Executing queued leader status!" << std::endl;
             LeaderStatus leaderStatus = currentUpdate.second;
-            v2vservice->sendSteering(leaderStatus.speed());
-            v2vservice->sendSpeed(leaderStatus.steeringAngle());
+            v2vservice->sendSpeed(leaderStatus.speed());
+            v2vservice->sendSteering(leaderStatus.steeringAngle());
             
         } else if (!updateQueue->empty()) {
             /*

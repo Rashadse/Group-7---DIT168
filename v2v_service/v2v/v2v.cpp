@@ -597,11 +597,11 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
     
         if (lastLeaderUpdate == 0) { // If the last leader update was not registered yet for 
                                      // some reason, use the default time delay.
-            update.first = 125;
+            update.first = 150;
         } else {
             // Actual time between updates
             //update.first = getTime() - lastLeaderUpdate;
-            update.first = 125;
+            update.first = 150;
         }
         
         update.second = leaderStatusUpdate;

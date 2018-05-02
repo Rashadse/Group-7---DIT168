@@ -116,7 +116,7 @@ private:
     int index;
 
     float speedOffset = 0.0;
-    float steeringOffset = 0.0;
+    float steeringOffset = -0.07;
 
     std::string myIp;
     std::string myGroupId;

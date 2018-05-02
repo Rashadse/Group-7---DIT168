@@ -457,13 +457,6 @@ void *executeLeaderUpdates(void *v2v) {
              */
             v2vservice->stopCar();
             std::this_thread::sleep_for(50ms);
-        } else {
-            // We could come into a scenario where leader statuses simply do not get sent, at which point we have to
-            // abort the following. This case should really not happen since we will disconnect if there has been more
-            // than 1000ms between updates. Mostly for debugging purposes.
-            std::cout << "Update queue empty! Did no leader statuses get sent?" << std::endl;
-            v2vservice->stopCar();
-            break;
         }
     }
 
@@ -487,7 +480,7 @@ void V2VService::startFollowing() {
      */
     std::cout << "Starting to pre fill update queue" << std::endl;
     uint64_t time = getTime();
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 7; i++) {
         std::pair<uint64_t, LeaderStatus> initialUpdate;
         LeaderStatus leaderStatus;
         leaderStatus.speed(0.15);
@@ -606,7 +599,8 @@ void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
             update.first = 125;
         } else {
             // Actual time between updates
-            update.first = getTime() - lastLeaderUpdate;
+            //update.first = getTime() - lastLeaderUpdate;
+            update.first = 125;
         }
         
         update.second = leaderStatusUpdate;

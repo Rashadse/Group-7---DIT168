@@ -429,6 +429,7 @@ void *executeLeaderUpdates(void *v2v) {
     std::cout << "Execute leader updates thread started!" << std::endl;
 
     std::pair<uint64_t, LeaderStatus> currentUpdate;
+    float lastSteering;
     LeaderStatus leaderStatus;
 
 
@@ -448,8 +449,17 @@ void *executeLeaderUpdates(void *v2v) {
 
             std::cout << "Executing queued leader status!" << std::endl;
             leaderStatus = currentUpdate.second;
+
+            // If we're evening out...
+            if (leaderStatus.steeringAngle() == 0 && lastSteering > 0) {
+                std::this_thread::sleep_for(300ms);
+            }
+
             v2vservice->sendSpeed(leaderStatus.speed());
             v2vservice->sendSteering(leaderStatus.steeringAngle());
+
+            // Last executed steering
+            lastSteering = leaderStatus.steeringAngle();
             
         } else if (!v2vservice->isLeaderMoving) {
             /*

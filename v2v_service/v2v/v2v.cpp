@@ -12,13 +12,14 @@
  * @param ip - IP address of the car running the service
  * @param groupId - ID of the car running the service
  */
-V2VService::V2VService(std::string ip, std::string groupId) {
+V2VService::V2VService(std::string ip, std::string groupId, float offSteering) {
     followerIp = "";
     leaderIp = "";
     myIp = ip;
     myGroupId = groupId;
     currentCarStatus.speed = 0;
     currentCarStatus.steeringAngle = 0;
+    steeringOffset = offSteering;
     
     /*
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This channel is where

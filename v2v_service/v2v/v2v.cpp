@@ -135,6 +135,9 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
                     currentCarStatus.steeringAngle = msg.steeringAngle();
+
+                    std::cout << "New steering: " << msg.steeringAngle() << std::endl;
+
                     break;
                 }
                 case DISTANCE_READING: {

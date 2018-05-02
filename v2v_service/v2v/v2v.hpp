@@ -60,7 +60,7 @@ struct CarStatus {
 
 class V2VService {
 public:
-    V2VService(std::string ip, std::string groupId);
+    V2VService(std::string ip, std::string groupId, float offSteering);
 
     // V2V message functions
     void announcePresence();

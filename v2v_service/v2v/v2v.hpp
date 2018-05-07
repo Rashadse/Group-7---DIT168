@@ -4,15 +4,20 @@
 #include <iomanip>
 #include <cstdint>
 #include <sys/time.h>
+
 #include <map>
+#include <queue>
 #include <string>
+
 #include <pthread.h>
 
 #include "cluon/OD4Session.hpp"
 #include "cluon/UDPSender.hpp"
 #include "cluon/UDPReceiver.hpp"
 #include "cluon/Envelope.hpp"
+
 #include "messages.hpp"
+
 
 // V2V external
 static const int BROADCAST_CHANNEL = 250;
@@ -55,36 +60,53 @@ struct CarStatus {
 
 class V2VService {
 public:
-    V2VService(std::string ip, std::string groupId);
+    V2VService(std::string ip, std::string groupId, float offSteering);
 
+    // V2V message functions
     void announcePresence();
     void followRequest(std::string vehicleIp);
     void followResponse();
     void stopFollow();
     void stopCar();
 
+    // Leading
     void startReportingToFollower();
     void leaderStatus(float speed, float steeringAngle);
+    
+    // Following
     void processLeaderStatus(LeaderStatus leaderStatusUpdate);
-
     void startReportingToLeader();
     void followerStatus();
-
-    std::map<std::string, std::string> getMapOfIps();
+    void startFollowing();
+    
+    // Testing
     void healthCheck();
+    
+    // Utility
+    std::map<std::string, std::string> getMapOfIps();
     
     static uint64_t getTime();
 
+    CarStatus *getCurrentCarStatus();
+    CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
+    
+    std::queue<std::pair<uint64_t, LeaderStatus>> *getLeaderUpdates();
+    
+    bool isLeaderMoving;
+    
+    void sendSteering(float steering);
+    void sendSpeed(float speed);
+
+    // V2V public status fields 
     std::string leaderIp;
     std::string followerIp;
 
     uint64_t lastFollowerUpdate;
     uint64_t lastLeaderUpdate;
     
-    CarStatus *getCurrentCarStatus();
-    CarStatus *setCurrentCarStatus(struct CarStatus *newCarStatus);
-
 private:
+    std::queue<std::pair<uint64_t, LeaderStatus>> leaderUpdates;
+
     CarStatus currentCarStatus;
 
     std::map<std::string, std::string> mapOfIps;
@@ -92,6 +114,9 @@ private:
 
     float sensorRange[5];
     int index;
+
+    float speedOffset = 0.0;
+    float steeringOffset;
 
     std::string myIp;
     std::string myGroupId;

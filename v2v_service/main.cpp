@@ -21,8 +21,9 @@ int main(int argc, char** argv) {
     /*
      * argv[1] = IP
      * argv[2] = Group ID
+     * argv[3] = steering offset for going straight
      */
-    shared_ptr<V2VService> v2vService = make_shared<V2VService>(argv[1], argv[2]);
+    shared_ptr<V2VService> v2vService = make_shared<V2VService>(argv[1], argv[2], stof(argv[3]));
 
     // Messages to test
     while (true) {

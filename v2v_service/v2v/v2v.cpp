@@ -429,7 +429,7 @@ void *executeLeaderUpdates(void *v2v) {
     std::cout << "Execute leader updates thread started!" << std::endl;
 
     std::pair<uint64_t, LeaderStatus> currentUpdate;
-    float lastSteering;
+    float lastSteering = 0;
     LeaderStatus leaderStatus;
 
 

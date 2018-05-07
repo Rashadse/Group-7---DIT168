@@ -485,9 +485,6 @@ void V2VService::startFollowing() {
 
     /*
      * This will prefill the leader status queue with updates to go the first 1 meter straight,
-     * right now takes about 3 seconds in total at 15% power and (naturally) 0.0 steering.
-     *
-     * 125ms * 24 = 3000ms = 3 seconds.
      */
     std::cout << "Starting to pre fill update queue" << std::endl;
     uint64_t time = getTime();
@@ -635,6 +632,9 @@ void V2VService::stopCar() {
 void V2VService::sendSteering(float steering) {
     opendlv::proxy::GroundSteeringReading steeringMsg;
 
+    // Two different offsets exist, the offset that is set with the object constructor is for going straight, the second
+    // in the else statement is to account for ours versus group 1s steering. We cannot steer as much as them so we had
+    // to increase our own.
     if (steering == 0) {
         steeringMsg.steeringAngle(steering + (steeringOffset));
     } else {
@@ -665,8 +665,15 @@ void V2VService::sendSpeed(float speed) {
  */
 void V2VService::leaderStatus(float speed, float steeringAngle) {
     uint8_t distanceTraveled = 0;
-    if (speed <= 0.15 && speed >= 0.13){
+
+    if (speed == 0.15) {
         distanceTraveled = 7;
+    } else if (speed > 0.15 && speed < 0.17) {
+        distanceTraveled = 9;
+    } else if (speed > 0.17 && speed < 0.18) {
+        distanceTraveled = 11;
+    } else if (speed > 0.18 && speed <= 0.20) {
+        distanceTraveled = 13;
     }
 
     if (followerIp.empty()) return;
@@ -724,7 +731,7 @@ void V2VService::healthCheck() {
     std::cout << "--------------------------------------" << std::endl;
     std::cout << "GroupID : " << myGroupId << " IP-address : " << myIp << std::endl;
     std::cout << "--------------------------------------" << std::endl;
-    std::cout << "Current Time (s)  : " << getTime() << std::endl;
+    std::cout << "Current Time (ms) : " << getTime() << std::endl;
     std::cout << "Current speed (%) : " << status->speed << std::endl;
     std::cout << "Current angle (%) : " << status->steeringAngle << std::endl;
     std::cout << "--------------------------------------" << std::endl;

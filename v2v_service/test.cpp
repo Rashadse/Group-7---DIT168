@@ -3,6 +3,9 @@
 #include <chrono>
 #include <thread>
 
+/**
+ * Test for time delay values and how to convert them.
+ */
 
 int main() {
     uint64_t time = 1000;

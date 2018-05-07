@@ -7,6 +7,12 @@
 template <class T>
 std::string encode(T msg);
 
+/**
+ * This is just a simulation program to use before any other group gets their following/leading logic in place. It will
+ * create leader updates and can feed them to our car to simulate another vehicle. Note that you will need to uncomment
+ * some filtering logic in the incoming UDP receiver in the V2V microservice to use this. The filter removes anything
+ * that was sent from an IP that is NOT our leader.
+ */
 
 using namespace std;
 int main(int argc, char** argv) {
@@ -37,7 +43,7 @@ int main(int argc, char** argv) {
     cout << "80%       " << std::flush;
     cout << "90%       " << std::flush;
     cout << "100%" << std::endl;
-    while (numberOfUpdates < 100) { // roughly 15 seconds worth of updates
+    while (numberOfUpdates < 100) { // 12.5 seconds worth of updates
         LeaderStatus ls;
         
         if (numberOfUpdates < 18) {

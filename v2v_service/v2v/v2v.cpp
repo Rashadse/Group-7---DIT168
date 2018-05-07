@@ -12,13 +12,14 @@
  * @param ip - IP address of the car running the service
  * @param groupId - ID of the car running the service
  */
-V2VService::V2VService(std::string ip, std::string groupId) {
+V2VService::V2VService(std::string ip, std::string groupId, float offSteering) {
     followerIp = "";
     leaderIp = "";
     myIp = ip;
     myGroupId = groupId;
     currentCarStatus.speed = 0;
     currentCarStatus.steeringAngle = 0;
+    steeringOffset = offSteering;
     
     /*
      * The broadcast field contains a reference to the broadcast channel which is an OD4Session. This channel is where
@@ -135,6 +136,9 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                 case GROUND_STEERING_READING: {
                     GroundSteeringReading msg = cluon::extractMessage<GroundSteeringReading>(std::move(envelope));
                     currentCarStatus.steeringAngle = msg.steeringAngle();
+
+                    std::cout << "New steering: " << msg.steeringAngle() << std::endl;
+
                     break;
                 }
                 case DISTANCE_READING: {
@@ -208,7 +212,11 @@ V2VService::V2VService(std::string ip, std::string groupId) {
 
                     // Makes sure we do not accept any rogue responses.
                     if (senderIp == leaderIp) {
+                        isLeaderMoving = false; // Until we receive the first leader status, we assume the leader is standstill.
+                        
                         startReportingToLeader();
+                        
+                        startFollowing();
 
                         InternalFollowResponse msg;
                         msg.groupid(mapOfIds[senderIp]);
@@ -263,9 +271,8 @@ V2VService::V2VService(std::string ip, std::string groupId) {
                                  
                     internalBroadCast->send(leaderStatus);
 
-                    // Only process the message if we have a leader.
-                    if (!leaderIp.empty()) {
-                        lastLeaderUpdate = getTime();
+                    // Only process the messages from the leader.
+                    if (senderIp == leaderIp) {
                         processLeaderStatus(leaderStatus);
                     }
                     break;
@@ -301,6 +308,8 @@ void V2VService::followRequest(std::string vehicleIp) {
     toLeader = std::make_shared<cluon::UDPSender>(leaderIp, DEFAULT_PORT);
     FollowRequest followRequest;
     toLeader->send(encode(followRequest));
+    
+    internalBroadCast->send(followRequest);
 }
 
 /**
@@ -311,6 +320,8 @@ void V2VService::followResponse() {
     if (followerIp.empty()) return;
     FollowResponse followResponse;
     toFollower->send(encode(followResponse));
+    
+    internalBroadCast->send(followResponse);
 }
 
 /**
@@ -339,6 +350,10 @@ void V2VService::stopFollow() {
     // Clear timestamps
     lastFollowerUpdate = 0;
     lastLeaderUpdate = 0;
+    
+    isLeaderMoving = false;
+    
+    internalBroadCast->send(stopFollow);
 }
 
 /**
@@ -394,6 +409,122 @@ void V2VService::followerStatus() {
     if (leaderIp.empty()) return;
     FollowerStatus followerStatus;
     toLeader->send(encode(followerStatus));
+    
+    internalBroadCast->send(followerStatus);
+}
+
+/**
+ * This function is designed to be the target of a pthread starting. It will take care of sending FollowerStatus
+ * messages to the leading car as well as check that the leading car has been sending regular updates.
+ *
+ * @param v2v - the v2v service object reference from which this thread function will both take and get information from
+ * @return N/A
+ */
+void *executeLeaderUpdates(void *v2v) {
+    V2VService *v2vservice;
+    v2vservice = (V2VService *)v2v;
+
+    std::queue<std::pair<uint64_t, LeaderStatus>> *updateQueue;
+    updateQueue = v2vservice->getLeaderUpdates(); // Get reference to leader status update queue
+    std::cout << "Execute leader updates thread started!" << std::endl;
+
+    std::pair<uint64_t, LeaderStatus> currentUpdate;
+    float lastSteering;
+    LeaderStatus leaderStatus;
+
+
+    using namespace std::chrono_literals;
+    while (!v2vservice->leaderIp.empty()) {        
+
+        // If leader car is moving and the update queue is not empty...
+        if (v2vservice->isLeaderMoving && !updateQueue->empty()) {
+            /*
+             * If leader is moving, pop the update queue and wait for the set time before actuating.
+             */
+            currentUpdate = updateQueue->front();
+            updateQueue->pop();
+            std::chrono::milliseconds sleepTime(currentUpdate.first);
+            std::cout << "Sleeping for before executing queued update..." << std::endl;
+            std::this_thread::sleep_for(sleepTime);
+
+            std::cout << "Executing queued leader status!" << std::endl;
+            leaderStatus = currentUpdate.second;
+
+            // If we're evening out...
+            if (leaderStatus.steeringAngle() == 0 && lastSteering > 0) {
+                std::this_thread::sleep_for(150ms);
+            }
+
+            v2vservice->sendSpeed(leaderStatus.speed());
+            v2vservice->sendSteering(leaderStatus.steeringAngle());
+
+            // Last executed steering
+            lastSteering = leaderStatus.steeringAngle();
+            
+        } else if (!v2vservice->isLeaderMoving) {
+            /*
+             * Necessary for a special case where during the above sleep the leader stops moving and we execute the
+             * command towards the motor anyway. We should then fall into here and stop the car shortly thereafter.
+             */
+            v2vservice->stopCar();
+            std::this_thread::sleep_for(50ms);
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
+/**
+ * This function starts the thread that will take care of sending statuses to the leading vehicle.
+ */
+void V2VService::startFollowing() {
+    lastLeaderUpdate = getTime();
+
+    // Empty the old queue since new following has been initialised.
+    std::queue<std::pair<uint64_t, LeaderStatus>> newQueue;
+
+    /*
+     * This will prefill the leader status queue with updates to go the first 1 meter straight,
+     */
+    std::cout << "Starting to pre fill update queue" << std::endl;
+    uint64_t time = getTime();
+    for (int i = 0; i < 9; i++) {
+        std::pair<uint64_t, LeaderStatus> initialUpdate;
+        LeaderStatus leaderStatus;
+        leaderStatus.speed(0.15);
+        leaderStatus.steeringAngle(0.0);
+
+        initialUpdate.first = 125; // Standard delay
+        initialUpdate.second = leaderStatus;
+
+        newQueue.push(initialUpdate);
+    }
+    std::cout << "Pre fill took " << (getTime() - time) << "ms" << std::endl;
+    /*
+     * Perform swap here to avoid problem where leader statuses get filled simultaneously, that's because the sequence
+     * looks like this:
+     *
+     * Other car                    Our car
+     *     |  <-- Follow Request ----  |
+     *     |  --- Follow Response -->  |
+     * < Starts sending >     < Start listening >
+     *     |                           |
+     *
+     * If we do not swap the queues here, we could get interfering leader statuses during the pre fill which will be
+     * erroneously inserted in the middle of the "pre fill" updates, meaning the car could suddenly turn slightly
+     * during ramp-up. Swapping here makes sure that even if we received some updates during pre fill, they will be
+     * ignored. Trade off, but should not mean losing more than 1 update in the absolute worst case.
+     */
+    std::swap(leaderUpdates, newQueue);
+
+    int status;
+    pthread_t threadId;
+    status = pthread_create(&threadId, NULL, executeLeaderUpdates, (void *)this);
+    
+    // pthread_create returns 1 if an error occured.
+    if (status) {
+        std::cout << "Error creating update leader thread" << std::endl;
+    }
 }
 
 /**
@@ -456,43 +587,73 @@ void V2VService::startReportingToFollower() {
  * @param leaderStatusUpdate - latest status update from leading vehicle to process
  */
 void V2VService::processLeaderStatus(LeaderStatus leaderStatusUpdate) {
-    float steering = leaderStatusUpdate.steeringAngle();
     float speed = leaderStatusUpdate.speed();
-    //uint8_t fled = leaderStatusUpdate.distanceTraveled();
-    //uint64_t timestamp = leaderStatusUpdate.timestamp();
-
-    /*
-     * 1. Process gotten data
-     */
-
-    opendlv::proxy::GroundSteeringReading steeringMsg;
-    opendlv::proxy::PedalPositionReading speedMsg;
-    steeringMsg.steeringAngle(steering);
-    speedMsg.percent(speed);
-
-    /*
-     * 2. Wait until you have traveled <distanceTraveled>, take into account the time delay using the timestamp
-     */
-
-    // wait
-
-    /*
-     * 3. Actuate against motor channel
-     */
-    motorBroadcast->send(steeringMsg);
-    motorBroadcast->send(speedMsg);
+    
+    if (speed == 0) { // Maybe add a higher lower bound since car does not move until 15~ percent?
+        /* 
+        No point in logging (inserting into queue) a speed of 0 since any included steering will 
+        have no effect to movement. 
+        */
+        isLeaderMoving = false; // This is to make sure we only move then the leader does.
+        
+        sendSpeed(speed);
+    } else {
+        isLeaderMoving = true; // This is to make sure we only move when the leader does.
+    
+        std::pair<uint64_t, LeaderStatus> update;
+    
+        if (lastLeaderUpdate == 0) { // If the last leader update was not registered yet for 
+                                     // some reason, use the default time delay.
+            update.first = 125;
+        } else {
+            // Actual time between updates
+            //update.first = getTime() - lastLeaderUpdate;
+            update.first = 125;
+        }
+        
+        update.second = leaderStatusUpdate;
+        leaderUpdates.push(update);
+    }
+    
+    lastLeaderUpdate = getTime(); 
 }
 
 /**
  * Sends actuating messages to motor channel to stop the car.
  */
 void V2VService::stopCar() {
+
+    if (currentCarStatus.speed > 0) {
+        sendSteering(0.0);
+        sendSpeed(0.0);
+    }
+}
+
+void V2VService::sendSteering(float steering) {
     opendlv::proxy::GroundSteeringReading steeringMsg;
-    opendlv::proxy::PedalPositionReading speedMsg;
-    steeringMsg.steeringAngle(0.0);
-    speedMsg.percent(0.0);
+
+    // Two different offsets exist, the offset that is set with the object constructor is for going straight, the second
+    // in the else statement is to account for ours versus group 1s steering. We cannot steer as much as them so we had
+    // to increase our own.
+    if (steering == 0) {
+        steeringMsg.steeringAngle(steering + (steeringOffset));
+    } else {
+        steeringMsg.steeringAngle(steering * 2);
+    }
     motorBroadcast->send(steeringMsg);
-    motorBroadcast->send(speedMsg);
+}
+
+void V2VService::sendSpeed(float speed) {
+    opendlv::proxy::PedalPositionReading speedMsg;
+
+    // Offset only applies for speeds > 0.
+    if (speed == 0) {
+        speedMsg.percent(speed);
+        motorBroadcast->send(speedMsg);
+    } else {
+        speedMsg.percent(speed + (speedOffset));
+        motorBroadcast->send(speedMsg);
+    }
 }
 
 /**
@@ -504,8 +665,15 @@ void V2VService::stopCar() {
  */
 void V2VService::leaderStatus(float speed, float steeringAngle) {
     uint8_t distanceTraveled = 0;
-    if (speed <= 0.15 && speed >= 0.13){
+
+    if (speed == 0.15) {
         distanceTraveled = 7;
+    } else if (speed > 0.15 && speed < 0.17) {
+        distanceTraveled = 9;
+    } else if (speed > 0.17 && speed < 0.18) {
+        distanceTraveled = 11;
+    } else if (speed > 0.18 && speed <= 0.20) {
+        distanceTraveled = 13;
     }
 
     if (followerIp.empty()) return;
@@ -515,6 +683,8 @@ void V2VService::leaderStatus(float speed, float steeringAngle) {
     leaderStatus.steeringAngle(steeringAngle);
     leaderStatus.distanceTraveled(distanceTraveled);
     toFollower->send(encode(leaderStatus));
+    
+    internalBroadCast->send(leaderStatus);
 }
 
 /**
@@ -533,6 +703,10 @@ std::map<std::string, std::string> V2VService::getMapOfIps() {
  */
 CarStatus *V2VService::getCurrentCarStatus() {
     return &currentCarStatus;
+}
+
+std::queue<std::pair<uint64_t, LeaderStatus>> *V2VService::getLeaderUpdates() {
+    return &leaderUpdates;
 }
 
 /**
@@ -557,7 +731,7 @@ void V2VService::healthCheck() {
     std::cout << "--------------------------------------" << std::endl;
     std::cout << "GroupID : " << myGroupId << " IP-address : " << myIp << std::endl;
     std::cout << "--------------------------------------" << std::endl;
-    std::cout << "Current Time (s)  : " << getTime() << std::endl;
+    std::cout << "Current Time (ms) : " << getTime() << std::endl;
     std::cout << "Current speed (%) : " << status->speed << std::endl;
     std::cout << "Current angle (%) : " << status->steeringAngle << std::endl;
     std::cout << "--------------------------------------" << std::endl;

@@ -6,6 +6,9 @@
 #include "v2v/v2v.hpp"
 #include "messages.hpp"
 
+/**
+ * This is a simulator for the remote control for internal protocol verification.
+ */
 
 using namespace std;
 int main() {

@@ -20,18 +20,3 @@ services:
         - /dev/:/dev/
         command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-pwm-motor --cid=180 --freq=50 --id=1"
 
-    device-ultrasonic-srf08-front:
-        image: chalmersrevere/opendlv-device-ultrasonic-srf08-armhf:v0.0.6
-        network_mode: "host"
-        privileged: true
-        volumes:
-          - /dev/i2c-1:/dev/i2c-1
-        command: "/usr/bin/opendlv-device-ultrasonic-srf08 --dev=/dev/i2c-1 --bus-address=112 --cid=180 --freq=5 --id=0"
-    
-    proxy-miniature-ps4controller:
-        image: seresearch/2018-dit-168:v0.3.5-armhf
-        network_mode: "host"
-        restart: always
-        devices:
-        - "/dev/input/js0:/dev/input/js0"
-        command: "/opt/opendlv.miniature/bin/opendlv-proxy-miniature-ps4controller --cid=180 --freq=10 --verbose=1"

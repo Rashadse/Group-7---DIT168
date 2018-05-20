@@ -14,8 +14,8 @@ using namespace std;
 int main(int argc, char** argv) {
 
     // Check that both IP address and groupid for the service has been provided.
-    if (argc < 3) {
-        cout << "You need to provide <ip-address> and <group ID>" << endl;
+    if (argc < 4) {
+        cout << "You need to provide <ip-address>, <group ID> and <steering offset>" << endl;
         exit(1);
     }
     /*

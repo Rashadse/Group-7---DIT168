@@ -20,7 +20,7 @@ VIZService::VIZService(std::string ip, std::string groupId) {
 // This channel is used for the visualisation microservice 
    visualisation = std::make_shared<cluon::OD4Session>(
         VISUALIZATION_CHANNEL,
-        [](cluon::data::Envelope &&/) noexcept {}
+        [](cluon::data::Envelope &&) noexcept {}
     ); // end visualisation declaration
 
 
